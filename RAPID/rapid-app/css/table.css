@@ -1,0 +1,149 @@
+/* Table Header Background Color */
+.table-custom thead th {
+    background-color: #f0f8ff;
+    /* Light green background for header */
+    font-size: 14px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 16px;
+    font-weight: bold;
+}
+
+/* Optional: Change font weight and text color for header */
+.table-custom thead th b {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Center the content in the table */
+.table-custom {
+    width: 100%;
+    margin-top: 20px;
+    text-align: center;
+}
+
+
+.pending-status p {
+    font-size: 14px !important;
+    background-color: #f1c40f !important;
+    color: #fff !important;
+    padding: 5px 10px !important;
+    border-radius: 25px !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+    font-weight: bold !important;
+}
+
+.active-status p {
+    font-size: 14px !important;
+    background-color: #27ae60 !important;
+    color: #fff !important;
+    padding: 5px 10px !important;
+    border-radius: 25px !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+    font-weight: bold !important;
+}
+
+.inactive-status p {
+    font-size: 14px !important;
+    background-color: #e74c3c !important;
+    color: #fff !important;
+    padding: 5px 10px !important;
+    border-radius: 25px !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+    font-weight: bold !important;
+}
+
+
+.unknown-status {
+    background-color: #7f8c8d !important;
+    /* Gray */
+    color: #fff !important;
+    padding: 5px 15px !important;
+    border-radius: 25px !important;
+    /* Oval shape */
+}
+
+/* Table Data Cells (td) */
+.table-custom td {
+    font-family: 'Arial', sans-serif;
+    color: #555555;
+    font-size: 13px;
+    text-align: center;
+    font-weight: 500;
+    vertical-align: middle;
+}
+
+.table-custom th,
+.table-custom td {
+    font-size: 13px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 16px;
+}
+
+.table-custom .btn {
+    font-size: 14px;
+    padding: 6px 12px;
+    margin-right: 8px;
+}
+
+.table-custom .no-accounts {
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+}
+
+/* Input Group Styles */
+.input-group {
+    font-size: 14px;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Select Dropdown Style */
+.form-select {
+    font-size: 14px;
+    background-color: #f0f8ff;
+    outline: 1px solid rgb(245, 245, 245);
+    color: #000000;
+}
+
+/* Input Field Style */
+.form-control {
+    font-size: 14px;
+    background-color: #f0f8ff;
+    outline: 1px solid rgb(245, 245, 245);
+    color: #000000;
+}
+
+.inputfield {
+    font-size: 14px;
+    background-color: #ffffff;
+    outline: 1px solid rgba(0, 0, 0, 0.234);
+    /* box-shadow: 1px 1px rgb(152, 152, 152); */
+    color: #000000;
+}
+
+/* Optional: Adding a margin for better spacing */
+.row.mb-3 {
+    margin-bottom: 1rem;
+    /* Adjust the bottom margin as needed */
+}
+
+/* Styling for the input group containers */
+.col-sm-3,
+.col-sm-6 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Adjusting input width and padding if necessary */
+.input-group .form-control,
+.input-group .form-select {
+    width: 100%;
+    padding: 10px;
+}
