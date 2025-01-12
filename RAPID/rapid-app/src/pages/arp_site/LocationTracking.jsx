@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import ManageAccountsContent from "../../components/admin_site/ManageAccountsContent";
-import NavBar from "../../components/admin_site/NavBar";
-import Sidebar from "../../components/admin_site/Sidebar";
+import LocationTrackingContent from "../../components/arp_site/LocationTrackingContent";
+import NavBar from "../../components/arp_site/NavBar";
+import Sidebar from "../../components/arp_site/Sidebar";
 import { Routing } from "../routing/routing";
 
 
-function ManageAccount() {
+function LocationTracking() {
     const [authorization, setAuthorization] = useState(false);
 
     useEffect(() => {
@@ -13,21 +13,21 @@ function ManageAccount() {
     }, []);
 
     return (
+
         <>
-            <Routing pageAuth="Admin" setAuthorization={setAuthorization} />
+            <Routing pageAuth="AmbulancePersonnel" setAuthorization={setAuthorization} />
 
             {authorization ? (
                 <>
                     <NavBar />
-                    <Sidebar />
-                    <ManageAccountsContent />
+                    <LocationTrackingContent />
                 </>
             ) : (
                 <div>You do not have permission to view this page.</div>
             )}
         </>
-    );
 
+    );
 }
 
-export default ManageAccount;
+export default LocationTracking;

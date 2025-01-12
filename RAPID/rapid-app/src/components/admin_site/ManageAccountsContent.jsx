@@ -95,6 +95,7 @@ function ManageAccountsContent() {
                             </div>
                         </div>
                     </header>
+
                     <main className="py-6 bg-surface-secondary">
                         <div className="container-fluid">
                             <section className="section dashboard">
@@ -108,6 +109,7 @@ function ManageAccountsContent() {
                                                         <div className="card-header">
                                                             <h5 className="mb-0">List of User Accounts</h5>
                                                         </div>
+
                                                         <section className="section">
                                                             <div className="row">
                                                                 <div className="col-lg-12">

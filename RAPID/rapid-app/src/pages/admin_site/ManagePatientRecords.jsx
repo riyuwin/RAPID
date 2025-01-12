@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import ManageAccountsContent from "../../components/admin_site/ManageAccountsContent";
 import NavBar from "../../components/admin_site/NavBar";
 import Sidebar from "../../components/admin_site/Sidebar";
+import ManagePatientRecordsContent from "../../components/admin_site/ManagePatientRecordsContent";
 import { Routing } from "../routing/routing";
 
-
-function ManageAccount() {
+function ManagePatientRecords() {
     const [authorization, setAuthorization] = useState(false);
 
     useEffect(() => {
@@ -20,7 +19,7 @@ function ManageAccount() {
                 <>
                     <NavBar />
                     <Sidebar />
-                    <ManageAccountsContent />
+                    <ManagePatientRecordsContent />
                 </>
             ) : (
                 <div>You do not have permission to view this page.</div>
@@ -30,4 +29,4 @@ function ManageAccount() {
 
 }
 
-export default ManageAccount;
+export default ManagePatientRecords;

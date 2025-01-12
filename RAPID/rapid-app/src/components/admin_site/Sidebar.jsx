@@ -26,54 +26,32 @@ function Sidebar({ isVisible }) {
 
                         <hr />
 
-                        <li className="nav-heading">ADMIN TOOL</li>
+                        <li className="nav-heading">MANAGE PATIENT CARE REPORT</li>
 
                         <li className="nav-item">
                             <a
-                                className={`nav-link ${isActive('/admin/ambulance_request') ? '' : 'collapsed'}`}
-                                href="/admin/ambulance_request"
+                                className={`nav-link ${isActive('/admin/manage_patient_records') ? '' : 'collapsed'}`}
+                                href="/admin/manage_patient_records"
                             >
-                                <i className="bx bxs-ambulance"></i>
-                                <span>Patient Information</span>
+                                <i className="bx bxs-briefcase"></i>
+                                <span>Patient Care Records</span>
                             </a>
-                        </li>
 
-                        <li className="nav-item">
                             <a
-                                className={`nav-link ${isActive('/admin/map') ? '' : 'collapsed'}`}
-                                href="/admin/map"
+                                className={`nav-link ${isActive('/admin/manage_tracking_report') ? '' : 'collapsed'}`}
+                                href="/admin/manage_tracking_report"
                             >
                                 <i className="bx bxs-map"></i>
-                                <span>Map</span>
+                                <span>Tracking Report</span>
                             </a>
                         </li>
 
-                        <hr />
 
-                        <li className="nav-heading">REQUEST INFORMATION</li>
-
-                        <li className="nav-item">
-                            <a
-                                className={`nav-link ${isActive('/admin/admin_job_vacancy_view') ? '' : 'collapsed'}`}
-                                href="admin_job_vacancy_view.html"
-                            >
-                                <i className="bx bxs-briefcase"></i>
-                                <span>Search Request</span>
-                            </a>
-                            <a
-                                className={`nav-link ${isActive('/admin/admin_job_vacancy_view') ? '' : 'collapsed'}`}
-                                href="admin_job_vacancy_view.html"
-                            >
-                                <i className="bx bxs-briefcase"></i>
-                                <span>Request Information</span>
-                            </a>
-                        </li>
-
-                        <hr />
 
                         <li className="nav-heading">CONFIGURATION</li>
 
                         <li className="nav-item">
+
                             <a
                                 className={`nav-link ${isActive('/admin/manage_ambulance') ? '' : 'collapsed'}`}
                                 href="/admin/manage_ambulance"

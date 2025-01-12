@@ -73,7 +73,7 @@ function NavBar() {
         <>
             <header id="header" className="header fixed-top d-flex align-items-center">
                 <div className="d-flex align-items-center justify-content-center">
-                    <a href="/" className="logo d-flex align-items-center mx-auto">
+                    <a href="/admin/dashboard" className="logo d-flex align-items-center mx-auto">
                         <img src="../../assets/img/med_logo.png" alt="Logo" />
                         <span className="d-none d-lg-block">RAPID</span>
                     </a>

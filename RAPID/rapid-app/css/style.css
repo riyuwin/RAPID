@@ -1314,3 +1314,43 @@ hr {
 .required-form {
   color: red;
 }
+
+.trackingDetailsItem {
+  border: 1px solid #f1f1f1a7;
+  padding: 16px;
+  font-size: 14px;
+  color: black;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+
+.trackingDetailsItem .locationLogoContainer {
+  width: 50px;
+  height: 50px;
+}
+
+.trackingDetailsItem .locationLogo {
+  width: 100%;
+  height: 100%;
+}
+
+/* For smaller screens, such as phones */
+@media (max-width: 767px) {
+  .trackingDetailsItem .locationLogo {
+    /* display: none; */
+    /* Hide the logo on small screens */
+
+    width: 100%;
+    height: 50%;
+  }
+}
+
+td {
+  color: rgb(40, 39, 39);
+}
+
+.btn-link.active {
+  color: #a4a4a4;
+  /* example color */
+}

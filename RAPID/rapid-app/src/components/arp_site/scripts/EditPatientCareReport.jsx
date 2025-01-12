@@ -4,7 +4,7 @@ import { addDoc, collection, getDocs, query, where, doc, onSnapshot, updateDoc, 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import Swal from 'sweetalert2';
 
-export const handleSavePatientCareReport = async (accountId, ambulanceId) => {
+export const handleEditPatientCareReport = async (patientId, accountId) => {
 
     try {
 
@@ -601,8 +601,16 @@ export const handleSavePatientCareReport = async (accountId, ambulanceId) => {
         if (getCheckboxValueIfChecked('seatbeltHelmetNoSeatbelt')) seatbeltHelmet['seatbeltHelmetNoSeatbelt'] = getCheckboxValueIfChecked('seatbeltHelmetNoSeatbelt');
 
         try {
-            // Save the document to Firestore
-            const docRef = await addDoc(collection(firestore, "PatientCareReport"), {
+            // Validate that `patientId` is provided for the update
+            if (!patientId) {
+                throw new Error("No patient ID provided for update.");
+            }
+
+            // Reference the existing document using `patientId`
+            const docRef = doc(firestore, "PatientCareReport", patientId);
+
+            // Update the document in Firestore
+            await updateDoc(docRef, {
                 callDets: callDets,
                 basicInformation: basicInformation,
                 triageTagging: triageTagging,
@@ -651,26 +659,24 @@ export const handleSavePatientCareReport = async (accountId, ambulanceId) => {
                 injury: injury,
                 alcoholDrugs: alcoholDrugs,
                 seatbeltHelmet: seatbeltHelmet,
-                savedAt: serverTimestamp(), // Add server timestamp
+                savedAt: serverTimestamp(), // Update server timestamp
                 ambulancePersonelId: accountId,
-                patient_status: "Active",
-                ambulanceId: ambulanceId
+                patient_status: "Emergency",
+                /* ambulanceId: ambulanceId */
             });
 
-            console.log("Document written with ID: ", docRef.id);
-
-            await updateDoc(doc(firestore, "PatientCareReport", docRef.id), {
-                patientId: docRef.id,
-            });
+            console.log("Document updated with ID: ", patientId);
 
             Swal.fire({
                 icon: 'success',
-                title: 'Patient Care Report Saved!',
-                text: `Patient Care Record saved successfully.`,
+                title: 'Patient Care Report Updated!',
+                text: `Patient Care Record updated successfully.`,
                 confirmButtonText: 'OK',
-            })
+            }).then(() => {
+                location.reload();
+            });
         } catch (error) {
-            console.error("Error adding document: ", error);
+            console.error("Error updating document: ", error);
 
             Swal.fire({
                 icon: 'error',
@@ -679,6 +685,7 @@ export const handleSavePatientCareReport = async (accountId, ambulanceId) => {
                 confirmButtonText: 'Try Again',
             });
         }
+
 
 
     } catch (error) {
