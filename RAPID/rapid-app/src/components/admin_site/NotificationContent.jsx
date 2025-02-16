@@ -169,6 +169,9 @@ function NotificationContent() {
                                                                                     <b> "{data.Message}"</b>.
                                                                                 </p>
                                                                             )}
+                                                                            {data.NotificationStatus === "UpdateAccount" && (
+                                                                                <p className='notifText'>The account has been updated to <b>{data.TrackingStatus}</b>.</p>
+                                                                            )}
                                                                         </div>
 
                                                                         {/* View Buttons */}
@@ -192,6 +195,16 @@ function NotificationContent() {
                                                                                     className='btn btn-link'
                                                                                     type='button'
                                                                                     onClick={() => handleViewAccountProfile(data.TransactionId)}
+                                                                                >
+                                                                                    View
+                                                                                </button>
+                                                                            )}
+
+                                                                            {data.NotificationStatus === "UpdateAccount" && (
+                                                                                <button
+                                                                                    className='btn btn-link'
+                                                                                    type='button'
+                                                                                    onClick={() => handleViewAccountProfile(data.UserAccountID)}
                                                                                 >
                                                                                     View
                                                                                 </button>

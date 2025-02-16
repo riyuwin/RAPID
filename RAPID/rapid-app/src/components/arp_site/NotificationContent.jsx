@@ -185,6 +185,9 @@ function NotificationContent() {
                                                                                     <b> "{data.Message}"</b>.
                                                                                 </p>
                                                                             )}
+                                                                            {data.NotificationStatus === "UpdateAccount" && (
+                                                                                <p className='notifText'>The account has been updated to <b>{data.TrackingStatus}</b>.</p>
+                                                                            )}
                                                                         </div>
 
                                                                         {/* View Buttons */}
@@ -213,6 +216,7 @@ function NotificationContent() {
                                                                                 </button>
                                                                             )}
 
+
                                                                             {(data.NotificationStatus === "TrackingLocation" ||
                                                                                 data.NotificationStatus === "TrackingMessage") && (
                                                                                     <button
@@ -225,6 +229,7 @@ function NotificationContent() {
                                                                                         View
                                                                                     </button>
                                                                                 )}
+
                                                                         </div>
 
                                                                         {/* Notification Date */}
