@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { firestore } from '../../firebase/firebase';
 import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc, onSnapshot } from "@firebase/firestore";
-import '../../../css/style.css';
-import '../../../css/table.css';
+/* import '../../../css/style.css';
+import '../../../css/table.css'; */
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
@@ -159,6 +159,8 @@ function ManageAmbulanceContent() {
         return new Intl.DateTimeFormat('en-US', options).format(date);
     };
 
+
+
     return (
         <>
             <main id="main" className="main">
@@ -173,121 +175,114 @@ function ManageAmbulanceContent() {
                         </ol>
                     </nav>
                 </div>
-                <div className="h-screen flex-grow-1 overflow-y-lg-auto">
-                    <header className="bg-surface-primary border-bottom pt-6">
-                        <div className="container-fluid">
-                            <div className="row align-items-center">
-                                <div className="col-sm-6 col-12 mb-4 mb-sm-0">
-                                    <h1 className="h2 mb-0 ls-tight"></h1>
-                                </div>
-                            </div>
-                        </div>
-                    </header>
-                    <main className="py-6 bg-surface-secondary">
-                        <div className="container-fluid">
-                            <section className="section dashboard">
-                                <div className="row">
-                                    <div className="col-lg-12">
-                                        <div className="row">
-                                            <div className="col-xxl-12 col-md-12">
-                                                <div className="card shadow border-0 mb-7">
-                                                    <div className="card-header">
-                                                        <h5 className="mb-0">List of Ambulance</h5>
+
+                <hr />
+
+                <main className="py-6  ">
+                    <div className="container-fluid">
+                        <section className="section dashboard">
+                            <div className="row">
+
+                                <div className="col-lg-12">
+                                    <div className="row">
+                                        <div className="col-xxl-12 col-md-12">
+                                            <div className="card info-card sales-card">
+                                                <div className="card-body">
+                                                    <div className="d-flex justify-content-between align-items-center">
+                                                        <h5 className="card-title">List of Ambulance</h5>
                                                     </div>
-                                                    <section className="section">
-                                                        <div className="row">
-                                                            <div className="col-lg-12">
-                                                                <div className="card">
-                                                                    <div className="card-body">
-                                                                        <div className="row mb-3">
-                                                                            <div className="col-sm-3">
-                                                                                <div className="input-group">
-                                                                                    <input
-                                                                                        type="text"
-                                                                                        className="form-control"
-                                                                                        id="searchInput"
-                                                                                        placeholder="Search Ambulance Name"
-                                                                                        onChange={handleSearch}
-                                                                                    />
-                                                                                </div>
-                                                                            </div>
-                                                                            <div className="col-sm-6"></div>
-                                                                            <div className="col-sm-3">
-                                                                                <div className="input-group d-flex justify-content-end">
-                                                                                    <button
-                                                                                        className="btn btn-primary btn-sm"
-                                                                                        data-bs-toggle="modal"
-                                                                                        data-bs-target="#addAmbulanceModal"
-                                                                                        onClick={() => setSelectedAmbulance(null)} // Reset the form for adding a new ambulance
-                                                                                    >
-                                                                                        + Add Ambulance
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="table-responsive">
-                                                                            <table className="table datatable table-custom">
-                                                                                <thead>
-                                                                                    <tr>
-                                                                                        <th>No.</th>
-                                                                                        <th>Ambulance Name</th>
-                                                                                        <th>Date Registered</th>
-                                                                                        <th>Action</th>
-                                                                                    </tr>
-                                                                                </thead>
-                                                                                <tbody>
-                                                                                    {currentItems.length > 0 ? (
-                                                                                        currentItems.map((ambulance, index) => (
-                                                                                            <tr key={ambulance.id}>
-                                                                                                <td>{index + 1}</td>
-                                                                                                <td>{ambulance.AmbulanceName}</td>
-                                                                                                <td>{formatDate(ambulance.DateRegistered)}</td>
-                                                                                                <td>
-                                                                                                    <button
-                                                                                                        onClick={() => handleEdit(ambulance)}
-                                                                                                        className="btn btn-primary"
-                                                                                                        data-bs-toggle="modal"
-                                                                                                        data-bs-target="#addAmbulanceModal"
-                                                                                                    >
-                                                                                                        <i className="bx bx-edit-alt"></i> Edit
-                                                                                                    </button>
-                                                                                                    <button
-                                                                                                        onClick={() => handleDelete(ambulance.id)}
-                                                                                                        className="btn btn-danger"
-                                                                                                    >
-                                                                                                        <i className="bx bx-trash-alt"></i> Delete
-                                                                                                    </button>
-                                                                                                </td>
-                                                                                            </tr>
-                                                                                        ))
-                                                                                    ) : (
-                                                                                        <tr>
-                                                                                            <td colSpan="4" className="no-accounts">
-                                                                                                No ambulances found
-                                                                                            </td>
-                                                                                        </tr>
-                                                                                    )}
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
+
+                                                    {/* Filter and Search Section */}
+                                                    <div className="row mb-3">
+                                                        <div className="col-sm-3">
+                                                            <div className="input-group">
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    id="searchInput"
+                                                                    placeholder="Search Ambulance Name"
+                                                                    onChange={handleSearch}
+                                                                />
                                                             </div>
                                                         </div>
-                                                    </section>
+                                                        <div className="col-sm-6"></div>
+                                                        <div className="col-sm-3">
+                                                            <div className="input-group d-flex justify-content-end">
+                                                                <button
+                                                                    className="btn btn-primary btn-sm"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#addAmbulanceModal"
+                                                                    onClick={() => setSelectedAmbulance(null)} // Reset the form for adding a new ambulance
+                                                                >
+                                                                    + Add Ambulance
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="table-responsive">
+                                                        <table className="table datatable table-custom">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>No.</th>
+                                                                    <th>Ambulance Name</th>
+                                                                    <th>Date Registered</th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {currentItems.length > 0 ? (
+                                                                    currentItems.map((ambulance, index) => (
+                                                                        <tr key={ambulance.id}>
+                                                                            <td>{index + 1}</td>
+                                                                            <td>{ambulance.AmbulanceName}</td>
+                                                                            <td>{formatDate(ambulance.DateRegistered)}</td>
+                                                                            <td>
+                                                                                <button
+                                                                                    onClick={() => handleEdit(ambulance)}
+                                                                                    className="btn btn-primary"
+                                                                                    data-bs-toggle="modal"
+                                                                                    data-bs-target="#addAmbulanceModal"
+                                                                                >
+                                                                                    <i className="bx bx-edit-alt"></i> Edit
+                                                                                </button>
+                                                                                <button
+                                                                                    onClick={() => handleDelete(ambulance.id)}
+                                                                                    className="btn btn-danger"
+                                                                                >
+                                                                                    <i className="bx bx-trash-alt"></i> Delete
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))
+                                                                ) : (
+                                                                    <tr>
+                                                                        <td colSpan="4" className="no-accounts">
+                                                                            No ambulances found
+                                                                        </td>
+                                                                    </tr>
+                                                                )}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </section>
-                        </div>
-                    </main>
-                </div>
+
+
+
+
+                            </div>
+                        </section>
+                    </div>
+                </main>
             </main>
 
             {/* Modal */}
-            <div className="modal fade" id="addAmbulanceModal" tabindex="-1" aria-labelledby="addAmbulanceModal" aria-hidden="true">
+            <div className="modal fade" id="addAmbulanceModal" tabIndex="-1" aria-labelledby="addAmbulanceModal" aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">

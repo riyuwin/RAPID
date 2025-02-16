@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 import { firestore } from '../../firebase/firebase';
 import { addDoc, collection } from "@firebase/firestore"
-import '../../../css/style.css';
-import '../../../css/style3.css';
+/* import '../../../css/style.css';
+import '../../../css/style3.css'; */
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 

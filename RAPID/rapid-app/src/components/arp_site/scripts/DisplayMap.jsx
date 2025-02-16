@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import '../../../../css/style.css';
+/* import '../../../../css/style.css'; */
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
 export const DisplayMap = ({ coordinates }) => {
+
     const [showMap, setShowMap] = useState(true);
     const [startPoint, setStartPoint] = useState([14.0996, 122.9550]); // Default fallback location
     const [currentLocation, setCurrentLocation] = useState(null);

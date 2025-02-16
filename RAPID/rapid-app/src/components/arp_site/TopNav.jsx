@@ -1,38 +1,48 @@
-import '../../../css/style.css';
-import '../../../css/style3.css';
+/* import '../../../css/style.css';
+import '../../../css/style3.css'; */
 import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function TopNav() {
     const location = useLocation();
 
     const isActive = (path) => location.pathname === path;
 
+
+    const handleNavigation = ({ url_path }) => {
+        navigate(url_path);
+        window.location.reload();
+    };
+
     return (
         <>
             <div className="col-12">
                 <div className="modal-body text-end">
-                    <a
+                    <Link
                         className={`btn btn-link ${isActive('/arp/dashboard') ? 'active' : ''}`}
                         style={{ marginRight: '10px' }}
-                        href="/arp/dashboard"
+                        to="/arp/dashboard"
+                    /* onClick={() => { handleNavigation("/arp/dashboard") }} */
                     >
                         Dashboard
-                    </a>
+                    </Link>
 
-                    <a
+                    <Link
                         className={`btn btn-link ${isActive('/arp/patient_care_report') ? 'active' : ''}`}
                         style={{ marginRight: '10px' }}
-                        href="/arp/patient_care_report"
+                        to="/arp/patient_care_report"
+                    /* onClick={() => { handleNavigation("/arp/patient_care_report") }} */
                     >
                         Patient Care Report
-                    </a>
+                    </Link>
 
-                    <a
+                    <Link
                         className={`btn btn-link ${isActive('/arp/location_tracking_record') ? 'active' : ''}`}
-                        href="/arp/location_tracking_record"
+                        to="/arp/location_tracking_record"
+                    /* onClick={() => { handleNavigation("/arp/location_tracking_record") }} */
                     >
                         Location Tracking Record
-                    </a>
+                    </Link>
                 </div>
             </div>
         </>
@@ -40,3 +50,4 @@ function TopNav() {
 }
 
 export default TopNav;
+

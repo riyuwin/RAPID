@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../../../css/style.css';
+/* import '../../../css/style.css'; */
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { firestore } from '../../firebase/firebase';
@@ -48,8 +48,6 @@ function LocationTrackingContent() {
 
     useEffect(() => {
         if (accountId) {
-            console.log("Fetched accountId:", accountId);
-
             fetchData(accountId)
         }
     }, [accountId]);
@@ -60,8 +58,6 @@ function LocationTrackingContent() {
             const arpId = await FetchActiveARP(user_accountId);
 
             if (arpId) {
-                console.log("Fetched ARP ID1222:", arpId);
-
                 setArpId(arpId); // Set the ARP document ID
 
             } else {

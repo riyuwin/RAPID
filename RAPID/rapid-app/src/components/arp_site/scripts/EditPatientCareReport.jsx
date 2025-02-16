@@ -64,6 +64,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         }
 
         basicInformation['nationality'] = nationality;
+        if (getValueInputIfNotEmpty('addressInput')) basicInformation['addressInput'] = getValueInputIfNotEmpty('addressInput');
 
         const triageTagging = {};
         if (getValueSelectIfNotEmpty('triageTaggingR')) triageTagging['triageTaggingR'] = getValueSelectIfNotEmpty('triageTaggingR');
@@ -92,6 +93,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
 
         const obs_gnyae = {};
         if (getCheckboxValueIfChecked('obsGynHaemorrhage')) obs_gnyae['obsGynHaemorrhage'] = true;
+        if (getCheckboxValueIfChecked('obsGynHaemorrhageLess')) obs_gnyae['obsGynHaemorrhageLess'] = true;
         if (getCheckboxValueIfChecked('obsGynLabour')) obs_gnyae['obsGynLabour'] = true;
         if (getCheckboxValueIfChecked('obsGynPPH')) obs_gnyae['obsGynPPH'] = true;
         if (getCheckboxValueIfChecked('obsGynPreDelivery')) obs_gnyae['obsGynPreDelivery'] = true;
@@ -99,7 +101,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         // Handle "Other Obstetrics/Gynaecology" logic
         const otherObsGynChecked = getCheckboxValueIfChecked('otherObsGyn');
         const otherObsGynInputValue = getValueInputIfNotEmpty('otherObsGynInput');
-        if (otherObsGynChecked && otherObsGynInputValue) {
+        if (otherObsGynInputValue) {
             obs_gnyae['otherObsGynInput'] = otherObsGynInputValue;
         }
 
@@ -107,6 +109,11 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         if (getCheckboxValueIfChecked('neurologicalAlteredLOC')) neurological['neurologicalAlteredLOC'] = true;
         if (getCheckboxValueIfChecked('neurologicalSeizures')) neurological['neurologicalSeizures'] = true;
         if (getCheckboxValueIfChecked('neurologicalStroke')) neurological['neurologicalStroke'] = true;
+
+        const otherNeurologicalInput = getValueInputIfNotEmpty('otherNeurologicalInput');
+        if (otherNeurologicalInput) {
+            neurological['otherNeurologicalInput'] = otherNeurologicalInput;
+        }
 
         // Handle "Other Neurological" logic
         const otherNeurologicalChecked = getCheckboxValueIfChecked('otherNeurological');
@@ -118,7 +125,6 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         const trauma = {};
         if (getCheckboxValueIfChecked('traumaBurns')) trauma['traumaBurns'] = true;
         if (getCheckboxValueIfChecked('traumaDislocation')) trauma['traumaDislocation'] = true;
-        if (getCheckboxValueIfChecked('neurologicalStroke')) trauma['neurologicalStroke'] = true; // Check if this is correctly categorized
         if (getCheckboxValueIfChecked('traumaFracture')) trauma['traumaFracture'] = true;
         if (getCheckboxValueIfChecked('traumaHaemorrhage')) trauma['traumaHaemorrhage'] = true;
         if (getCheckboxValueIfChecked('traumaHeadInjury')) trauma['traumaHeadInjury'] = true;
@@ -132,10 +138,9 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         // Handle "Other Trauma" logic
         const otherTraumaChecked = getCheckboxValueIfChecked('otherTrauma');
         const otherTraumaInputValue = getValueInputIfNotEmpty('otherTraumaInput');
-        if (otherTraumaChecked && otherTraumaInputValue) {
+        if (otherTraumaInputValue) {
             trauma['otherTraumaInput'] = otherTraumaInputValue;
         }
-
 
         const mechanismInjury = {};
         if (getCheckboxValueIfChecked('mechanismInjuryAssault')) mechanismInjury['mechanismInjuryAssault'] = true;
@@ -158,7 +163,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
 
         const mechanismInjuryOtherChecked = getCheckboxValueIfChecked('mechanismInjuryOther');
         const mechanismInjuryOtherInputValue = getValueInputIfNotEmpty('mechanismInjuryOtherInput');
-        if (mechanismInjuryOtherChecked && mechanismInjuryOtherInputValue) {
+        if (mechanismInjuryOtherInputValue) {
             mechanismInjury['mechanismInjuryOtherInput'] = mechanismInjuryOtherInputValue;
         }
 
@@ -171,7 +176,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
 
         const medicalOtherChecked = getCheckboxValueIfChecked('medicalOther');
         const medicalOtherInputValue = getValueInputIfNotEmpty('medicalOtherInput');
-        if (medicalOtherChecked && medicalOtherInputValue) {
+        if (medicalOtherInputValue) {
             medical['medicalOtherInput'] = medicalOtherInputValue;
         }
 
@@ -184,7 +189,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
 
         const respiratoryOtherChecked = getCheckboxValueIfChecked('respiratoryOther');
         const respiratoryOtherInputValue = getValueInputIfNotEmpty('respiratoryOtherInput');
-        if (respiratoryOtherChecked && respiratoryOtherInputValue) {
+        if (respiratoryOtherInputValue) {
             respiratory['respiratoryOtherInput'] = respiratoryOtherInputValue;
         }
 
@@ -199,7 +204,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
 
         const generalOtherChecked = getCheckboxValueIfChecked('generalOther');
         const generalOtherInputValue = getValueInputIfNotEmpty('generalOtherInput');
-        if (generalOtherChecked && generalOtherInputValue) {
+        if (generalOtherInputValue) {
             general['generalOtherInput'] = generalOtherInputValue;
         }
         const circumstances = {};
@@ -390,6 +395,8 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         const wound = {};
         if (getCheckboxValueIfChecked('bleedingControl')) wound['bleedingControl'] = getCheckboxValueIfChecked('bleedingControl');
         if (getCheckboxValueIfChecked('appliedAntiseptic')) wound['appliedAntiseptic'] = getCheckboxValueIfChecked('appliedAntiseptic');
+        if (getCheckboxValueIfChecked('cleaning')) wound['cleaning'] = getCheckboxValueIfChecked('cleaning');
+        if (getCheckboxValueIfChecked('dressingBandaging')) wound['dressingBandaging'] = getCheckboxValueIfChecked('dressingBandaging');
 
         const immobilisation = {};
         if (getCheckboxValueIfChecked('c-collar')) immobilisation['c-collar'] = getCheckboxValueIfChecked('c-collar');
@@ -414,6 +421,56 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         if (getCheckboxValueIfChecked('pain')) condition['pain'] = getCheckboxValueIfChecked('pain');
         if (getCheckboxValueIfChecked('rashes')) condition['rashes'] = getCheckboxValueIfChecked('rashes');
         if (getCheckboxValueIfChecked('numbness')) condition['numbness'] = getCheckboxValueIfChecked('numbness');
+
+        const characterModel = {};
+        if (getCheckboxValueIfChecked('rightHead')) characterModel['rightHead'] = getCheckboxValueIfChecked('rightHead');
+        if (getCheckboxValueIfChecked('rightNeck')) characterModel['rightNeck'] = getCheckboxValueIfChecked('rightNeck');
+        if (getCheckboxValueIfChecked('rightShoulder')) characterModel['rightShoulder'] = getCheckboxValueIfChecked('rightShoulder');
+        if (getCheckboxValueIfChecked('rightChest')) characterModel['rightChest'] = getCheckboxValueIfChecked('rightChest');
+        if (getCheckboxValueIfChecked('rightArm')) characterModel['rightArm'] = getCheckboxValueIfChecked('rightArm');
+        if (getCheckboxValueIfChecked('rightHand')) characterModel['rightHand'] = getCheckboxValueIfChecked('rightHand');
+        if (getCheckboxValueIfChecked('rightAbdomen')) characterModel['rightAbdomen'] = getCheckboxValueIfChecked('rightAbdomen');
+        if (getCheckboxValueIfChecked('rightHip')) characterModel['rightHip'] = getCheckboxValueIfChecked('rightHip');
+        if (getCheckboxValueIfChecked('rightThigh')) characterModel['rightThigh'] = getCheckboxValueIfChecked('rightThigh');
+        if (getCheckboxValueIfChecked('rightKnee')) characterModel['rightKnee'] = getCheckboxValueIfChecked('rightKnee');
+        if (getCheckboxValueIfChecked('rightShin')) characterModel['rightShin'] = getCheckboxValueIfChecked('rightShin');
+        if (getCheckboxValueIfChecked('rightFoot')) characterModel['rightFoot'] = getCheckboxValueIfChecked('rightFoot');
+        if (getCheckboxValueIfChecked('leftHead')) characterModel['leftHead'] = getCheckboxValueIfChecked('leftHead');
+        if (getCheckboxValueIfChecked('leftNeck')) characterModel['leftNeck'] = getCheckboxValueIfChecked('leftNeck');
+        if (getCheckboxValueIfChecked('leftShoulder')) characterModel['leftShoulder'] = getCheckboxValueIfChecked('leftShoulder');
+        if (getCheckboxValueIfChecked('leftChest')) characterModel['leftChest'] = getCheckboxValueIfChecked('leftChest');
+        if (getCheckboxValueIfChecked('leftArm')) characterModel['leftArm'] = getCheckboxValueIfChecked('leftArm');
+        if (getCheckboxValueIfChecked('leftHand')) characterModel['leftHand'] = getCheckboxValueIfChecked('leftHand');
+        if (getCheckboxValueIfChecked('leftAbdomen')) characterModel['leftAbdomen'] = getCheckboxValueIfChecked('leftAbdomen');
+        if (getCheckboxValueIfChecked('leftHip')) characterModel['leftHip'] = getCheckboxValueIfChecked('leftHip');
+        if (getCheckboxValueIfChecked('leftThigh')) characterModel['leftThigh'] = getCheckboxValueIfChecked('leftThigh');
+        if (getCheckboxValueIfChecked('leftKnee')) characterModel['leftKnee'] = getCheckboxValueIfChecked('leftKnee');
+        if (getCheckboxValueIfChecked('leftShin')) characterModel['leftShin'] = getCheckboxValueIfChecked('leftShin');
+        if (getCheckboxValueIfChecked('leftFoot')) characterModel['leftFoot'] = getCheckboxValueIfChecked('leftFoot');
+
+        if (getCheckboxValueIfChecked('rightBackHead')) characterModel['rightBackHead'] = getCheckboxValueIfChecked('rightBackHead');
+        if (getCheckboxValueIfChecked('rightBackNeck')) characterModel['rightBackNeck'] = getCheckboxValueIfChecked('rightBackNeck');
+        if (getCheckboxValueIfChecked('rightBackShoulder')) characterModel['rightBackShoulder'] = getCheckboxValueIfChecked('rightBackShoulder');
+        if (getCheckboxValueIfChecked('rightBackArm')) characterModel['rightBackArm'] = getCheckboxValueIfChecked('rightBackArm');
+        if (getCheckboxValueIfChecked('rightBackHand')) characterModel['rightBackHand'] = getCheckboxValueIfChecked('rightBackHand');
+        if (getCheckboxValueIfChecked('rightBackUpperBack')) characterModel['rightBackUpperBack'] = getCheckboxValueIfChecked('rightBackUpperBack');
+        if (getCheckboxValueIfChecked('rightBackLowerBack')) characterModel['rightBackLowerBack'] = getCheckboxValueIfChecked('rightBackLowerBack');
+        if (getCheckboxValueIfChecked('rightBackHip')) characterModel['rightBackHip'] = getCheckboxValueIfChecked('rightBackHip');
+        if (getCheckboxValueIfChecked('rightBackThigh')) characterModel['rightBackThigh'] = getCheckboxValueIfChecked('rightBackThigh');
+        if (getCheckboxValueIfChecked('rightCalf')) characterModel['rightCalf'] = getCheckboxValueIfChecked('rightCalf');
+        if (getCheckboxValueIfChecked('rightBackFoot')) characterModel['rightBackFoot'] = getCheckboxValueIfChecked('rightBackFoot');
+        if (getCheckboxValueIfChecked('leftBackHead')) characterModel['leftBackHead'] = getCheckboxValueIfChecked('leftBackHead');
+        if (getCheckboxValueIfChecked('leftBackNeck')) characterModel['leftBackNeck'] = getCheckboxValueIfChecked('leftBackNeck');
+        if (getCheckboxValueIfChecked('leftBackShoulder')) characterModel['leftBackShoulder'] = getCheckboxValueIfChecked('leftBackShoulder');
+        if (getCheckboxValueIfChecked('leftBackArm')) characterModel['leftBackArm'] = getCheckboxValueIfChecked('leftBackArm');
+        if (getCheckboxValueIfChecked('leftBackHand')) characterModel['leftBackHand'] = getCheckboxValueIfChecked('leftBackHand');
+        if (getCheckboxValueIfChecked('leftBackUpperBack')) characterModel['leftBackUpperBack'] = getCheckboxValueIfChecked('leftBackUpperBack');
+        if (getCheckboxValueIfChecked('leftBackLowerBack')) characterModel['leftBackLowerBack'] = getCheckboxValueIfChecked('leftBackLowerBack');
+        if (getCheckboxValueIfChecked('leftBackHip')) characterModel['leftBackHip'] = getCheckboxValueIfChecked('leftBackHip');
+        if (getCheckboxValueIfChecked('leftBackThigh')) characterModel['leftBackThigh'] = getCheckboxValueIfChecked('leftBackThigh');
+        if (getCheckboxValueIfChecked('leftCalf')) characterModel['leftCalf'] = getCheckboxValueIfChecked('leftCalf');
+        if (getCheckboxValueIfChecked('leftBackFoot')) characterModel['leftBackFoot'] = getCheckboxValueIfChecked('leftBackFoot');
+
 
         const endorsedTeam = {};
         if (getValueInputIfNotEmpty('endorsedByTeam')) endorsedTeam['endorsedByTeam'] = getValueInputIfNotEmpty('endorsedByTeam');
@@ -459,7 +516,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         const part1 = {};
         if (getCheckboxValueIfChecked('selfAccident')) part1['selfAccident'] = getCheckboxValueIfChecked('selfAccident');
         if (getCheckboxValueIfChecked('motorVehicleCollision')) part1['motorVehicleCollision'] = getCheckboxValueIfChecked('motorVehicleCollision');
-        if (getValueInputIfNotEmpty('incidentSummary')) part1['incidentSummary'] = getValueInputIfNotEmpty('incidentSummary');
+        if (getValueInputIfNotEmpty('collision_incidentSummary')) part1['collision_incidentSummary'] = getValueInputIfNotEmpty('collision_incidentSummary');
 
         const severity = {};
         if (getCheckboxValueIfChecked('fatal')) severity['fatal'] = getCheckboxValueIfChecked('fatal');
@@ -490,7 +547,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
 
         const classification = {};
         if (getValueInputIfNotEmpty('classificationPrivate')) classification['classificationPrivate'] = getValueInputIfNotEmpty('classificationPrivate');
-        if (getValueInputIfNotEmpty('vehicularAccidentDetails')) classification['classificationPublic'] = getValueInputIfNotEmpty('vehicularAccidentDetails');
+        if (getValueInputIfNotEmpty('classificationPublic')) classification['classificationPublic'] = getValueInputIfNotEmpty('classificationPublic');
         if (getValueInputIfNotEmpty('classificationGovernment')) classification['classificationGovernment'] = getValueInputIfNotEmpty('classificationGovernment');
         if (getValueInputIfNotEmpty('classificationDiplomat')) classification['classificationDiplomat'] = getValueInputIfNotEmpty('classificationDiplomat');
 
@@ -500,6 +557,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         if (getCheckboxValueIfChecked('jeepney')) typeVehicle['jeepney'] = getCheckboxValueIfChecked('jeepney');
         if (getCheckboxValueIfChecked('ambulance')) typeVehicle['ambulance'] = getCheckboxValueIfChecked('ambulance');
         if (getCheckboxValueIfChecked('heavyEquipment')) typeVehicle['heavyEquipment'] = getCheckboxValueIfChecked('heavyEquipment');
+        if (getCheckboxValueIfChecked('aircraft')) typeVehicle['aircraft'] = getCheckboxValueIfChecked('aircraft');
         if (getCheckboxValueIfChecked('tricycle')) typeVehicle['tricycle'] = getCheckboxValueIfChecked('tricycle');
         if (getCheckboxValueIfChecked('eBike')) typeVehicle['eBike'] = getCheckboxValueIfChecked('eBike');
         if (getCheckboxValueIfChecked('horseDriven')) typeVehicle['horseDriven'] = getCheckboxValueIfChecked('horseDriven');
@@ -546,7 +604,8 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         if (getCheckboxValueIfChecked('damageMultiple')) damage['damageMultiple'] = getCheckboxValueIfChecked('damageMultiple');
         if (getCheckboxValueIfChecked('damageFront')) damage['damageFront'] = getCheckboxValueIfChecked('damageFront');
         if (getCheckboxValueIfChecked('damageLeft')) damage['damageLeft'] = getCheckboxValueIfChecked('damageLeft');
-        if (getValueInputIfNotEmpty('damageOthers')) damage['damageOthers'] = getValueInputIfNotEmpty('damageOthers');
+        if (getCheckboxValueIfChecked('damageOthers')) damage['damageOthers'] = getCheckboxValueIfChecked('damageOthers');
+        if (getValueInputIfNotEmpty('damageOthersInput')) damage['damageOthersInput'] = getValueInputIfNotEmpty('damageOthersInput');
 
         const defect = {};
         if (getCheckboxValueIfChecked('defectBrakes')) defect['defectBrakes'] = getCheckboxValueIfChecked('defectBrakes');
@@ -556,7 +615,8 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         if (getCheckboxValueIfChecked('defectEngine')) defect['defectEngine'] = getCheckboxValueIfChecked('defectEngine');
         if (getCheckboxValueIfChecked('defectLights')) defect['defectLights'] = getCheckboxValueIfChecked('defectLights');
         if (getCheckboxValueIfChecked('defectTires')) defect['defectTires'] = getCheckboxValueIfChecked('defectTires');
-        if (getValueInputIfNotEmpty('defectOthers')) defect['defectOthers'] = getValueInputIfNotEmpty('defectOthers');
+        if (getCheckboxValueIfChecked('defectOthers')) defect['defectOthers'] = getCheckboxValueIfChecked('defectOthers');
+        if (getValueInputIfNotEmpty('defectOthersInput')) defect['defectOthersInput'] = getValueInputIfNotEmpty('defectOthersInput');
 
         const loading = {};
         if (getCheckboxValueIfChecked('loadingLegal')) loading['loadingLegal'] = getCheckboxValueIfChecked('loadingLegal');
@@ -638,6 +698,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
                 wound: wound,
                 immobilisation: immobilisation,
                 condition: condition,
+                characterModel: characterModel,
                 endorsedTeam: endorsedTeam,
                 incidentType: incidentType,
                 incidentLocation: incidentLocation,
@@ -663,6 +724,13 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
                 ambulancePersonelId: accountId,
                 patient_status: "Emergency",
                 /* ambulanceId: ambulanceId */
+            });
+
+            const notif_docRef = await addDoc(collection(firestore, "NotificationInformation"), {
+                NotificationStatus: "EditPatientCareReport",
+                TransactionId: patientId,
+                savedAt: serverTimestamp(),
+                AccountId: accountId,
             });
 
             console.log("Document updated with ID: ", patientId);

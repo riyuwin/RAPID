@@ -65,11 +65,16 @@ export const ResetForms = async () => {
     const nationalitySelect = document.getElementById('nationalitySelect');
     const otherNationality = document.getElementById('otherNationality');
 
-    if (nationalitySelect.value === "Other") {
+    nationality = otherNationality.value;
+
+    otherNationality.value = "";
+    nationalitySelect.value = "Filipino";
+
+    /* if (nationalitySelect.value === "Other") {
         nationality = otherNationality.value;
     } else {
         nationality = nationalitySelect.value;
-    }
+    } */
 
     basicInformation['nationality'] = nationality;
 
@@ -100,6 +105,7 @@ export const ResetForms = async () => {
 
     const obs_gnyae = {};
     if (getCheckboxValueIfChecked('obsGynHaemorrhage')) obs_gnyae['obsGynHaemorrhage'] = true;
+    if (getCheckboxValueIfChecked('obsGynHaemorrhageLess')) obs_gnyae['obsGynHaemorrhageLess'] = true;
     if (getCheckboxValueIfChecked('obsGynLabour')) obs_gnyae['obsGynLabour'] = true;
     if (getCheckboxValueIfChecked('obsGynPPH')) obs_gnyae['obsGynPPH'] = true;
     if (getCheckboxValueIfChecked('obsGynPreDelivery')) obs_gnyae['obsGynPreDelivery'] = true;
@@ -422,6 +428,59 @@ export const ResetForms = async () => {
     if (getCheckboxValueIfChecked('pain')) condition['pain'] = getCheckboxValueIfChecked('pain');
     if (getCheckboxValueIfChecked('rashes')) condition['rashes'] = getCheckboxValueIfChecked('rashes');
     if (getCheckboxValueIfChecked('numbness')) condition['numbness'] = getCheckboxValueIfChecked('numbness');
+
+    const characterModel = {};
+
+    if (getCheckboxValueIfChecked('rightHead')) characterModel['rightHead'] = getCheckboxValueIfChecked('rightHead');
+    if (getCheckboxValueIfChecked('rightNeck')) characterModel['rightNeck'] = getCheckboxValueIfChecked('rightNeck');
+    if (getCheckboxValueIfChecked('rightShoulder')) characterModel['rightShoulder'] = getCheckboxValueIfChecked('rightShoulder');
+    if (getCheckboxValueIfChecked('rightChest')) characterModel['rightChest'] = getCheckboxValueIfChecked('rightChest');
+    if (getCheckboxValueIfChecked('rightArm')) characterModel['rightArm'] = getCheckboxValueIfChecked('rightArm');
+    if (getCheckboxValueIfChecked('rightHand')) characterModel['rightHand'] = getCheckboxValueIfChecked('rightHand');
+    if (getCheckboxValueIfChecked('rightAbdomen')) characterModel['rightAbdomen'] = getCheckboxValueIfChecked('rightAbdomen');
+    if (getCheckboxValueIfChecked('rightHip')) characterModel['rightHip'] = getCheckboxValueIfChecked('rightHip');
+    if (getCheckboxValueIfChecked('rightThigh')) characterModel['rightThigh'] = getCheckboxValueIfChecked('rightThigh');
+    if (getCheckboxValueIfChecked('rightKnee')) characterModel['rightKnee'] = getCheckboxValueIfChecked('rightKnee');
+    if (getCheckboxValueIfChecked('rightShin')) characterModel['rightShin'] = getCheckboxValueIfChecked('rightShin');
+    if (getCheckboxValueIfChecked('rightFoot')) characterModel['rightFoot'] = getCheckboxValueIfChecked('rightFoot');
+
+    if (getCheckboxValueIfChecked('leftHead')) characterModel['leftHead'] = getCheckboxValueIfChecked('leftHead');
+    if (getCheckboxValueIfChecked('leftNeck')) characterModel['leftNeck'] = getCheckboxValueIfChecked('leftNeck');
+    if (getCheckboxValueIfChecked('leftShoulder')) characterModel['leftShoulder'] = getCheckboxValueIfChecked('leftShoulder');
+    if (getCheckboxValueIfChecked('leftChest')) characterModel['leftChest'] = getCheckboxValueIfChecked('leftChest');
+    if (getCheckboxValueIfChecked('leftArm')) characterModel['leftArm'] = getCheckboxValueIfChecked('leftArm');
+    if (getCheckboxValueIfChecked('leftHand')) characterModel['leftHand'] = getCheckboxValueIfChecked('leftHand');
+    if (getCheckboxValueIfChecked('leftAbdomen')) characterModel['leftAbdomen'] = getCheckboxValueIfChecked('leftAbdomen');
+    if (getCheckboxValueIfChecked('leftHip')) characterModel['leftHip'] = getCheckboxValueIfChecked('leftHip');
+    if (getCheckboxValueIfChecked('leftThigh')) characterModel['leftThigh'] = getCheckboxValueIfChecked('leftThigh');
+    if (getCheckboxValueIfChecked('leftKnee')) characterModel['leftKnee'] = getCheckboxValueIfChecked('leftKnee');
+    if (getCheckboxValueIfChecked('leftShin')) characterModel['leftShin'] = getCheckboxValueIfChecked('leftShin');
+    if (getCheckboxValueIfChecked('leftFoot')) characterModel['leftFoot'] = getCheckboxValueIfChecked('leftFoot');
+
+    if (getCheckboxValueIfChecked('rightBackHead')) characterModel['rightBackHead'] = getCheckboxValueIfChecked('rightBackHead');
+    if (getCheckboxValueIfChecked('rightBackNeck')) characterModel['rightBackNeck'] = getCheckboxValueIfChecked('rightBackNeck');
+    if (getCheckboxValueIfChecked('rightBackShoulder')) characterModel['rightBackShoulder'] = getCheckboxValueIfChecked('rightBackShoulder');
+    if (getCheckboxValueIfChecked('rightBackArm')) characterModel['rightBackArm'] = getCheckboxValueIfChecked('rightBackArm');
+    if (getCheckboxValueIfChecked('rightBackHand')) characterModel['rightBackHand'] = getCheckboxValueIfChecked('rightBackHand');
+    if (getCheckboxValueIfChecked('rightBackUpperBack')) characterModel['rightBackUpperBack'] = getCheckboxValueIfChecked('rightBackUpperBack');
+    if (getCheckboxValueIfChecked('rightBackLowerBack')) characterModel['rightBackLowerBack'] = getCheckboxValueIfChecked('rightBackLowerBack');
+    if (getCheckboxValueIfChecked('rightBackHip')) characterModel['rightBackHip'] = getCheckboxValueIfChecked('rightBackHip');
+    if (getCheckboxValueIfChecked('rightBackThigh')) characterModel['rightBackThigh'] = getCheckboxValueIfChecked('rightBackThigh');
+    if (getCheckboxValueIfChecked('rightCalf')) characterModel['rightCalf'] = getCheckboxValueIfChecked('rightCalf');
+    if (getCheckboxValueIfChecked('rightBackFoot')) characterModel['rightBackFoot'] = getCheckboxValueIfChecked('rightBackFoot');
+
+    if (getCheckboxValueIfChecked('leftBackHead')) characterModel['leftBackHead'] = getCheckboxValueIfChecked('leftBackHead');
+    if (getCheckboxValueIfChecked('leftBackNeck')) characterModel['leftBackNeck'] = getCheckboxValueIfChecked('leftBackNeck');
+    if (getCheckboxValueIfChecked('leftBackShoulder')) characterModel['leftBackShoulder'] = getCheckboxValueIfChecked('leftBackShoulder');
+    if (getCheckboxValueIfChecked('leftBackArm')) characterModel['leftBackArm'] = getCheckboxValueIfChecked('leftBackArm');
+    if (getCheckboxValueIfChecked('leftBackHand')) characterModel['leftBackHand'] = getCheckboxValueIfChecked('leftBackHand');
+    if (getCheckboxValueIfChecked('leftBackUpperBack')) characterModel['leftBackUpperBack'] = getCheckboxValueIfChecked('leftBackUpperBack');
+    if (getCheckboxValueIfChecked('leftBackLowerBack')) characterModel['leftBackLowerBack'] = getCheckboxValueIfChecked('leftBackLowerBack');
+    if (getCheckboxValueIfChecked('leftBackHip')) characterModel['leftBackHip'] = getCheckboxValueIfChecked('leftBackHip');
+    if (getCheckboxValueIfChecked('leftBackThigh')) characterModel['leftBackThigh'] = getCheckboxValueIfChecked('leftBackThigh');
+    if (getCheckboxValueIfChecked('leftCalf')) characterModel['leftCalf'] = getCheckboxValueIfChecked('leftCalf');
+    if (getCheckboxValueIfChecked('leftBackFoot')) characterModel['leftBackFoot'] = getCheckboxValueIfChecked('leftBackFoot');
+
 
     const endorsedTeam = {};
     if (getValueInputIfNotEmpty('endorsedByTeam')) endorsedTeam['endorsedByTeam'] = getValueInputIfNotEmpty('endorsedByTeam');

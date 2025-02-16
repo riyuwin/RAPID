@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import '../../../../css/style.css';
+/* import '../../../../css/style.css'; */
 import 'leaflet-routing-machine';
 import Swal from 'sweetalert2'; // Import SweetAlert2
 import { useFetchCurrentUser } from './FetchCurrentUser';
@@ -29,10 +29,12 @@ function MapWithTracking({ page }) {
     const [trackingActiveDetails, setTrackingActiveDetails] = useState(false);
 
     useEffect(() => {
-        if (page == "Dashboard") {
-
+        if (page === "Dashboard" && !sessionStorage.getItem("reloaded")) {
+            sessionStorage.setItem("reloaded", "true"); // Set flag
+            window.location.reload(); // Force reload
         }
-    }, [page])
+
+    }, []);
 
     const TrackingInitializer = async (user_accountId) => {
         const text_activeTrackingLabel = document.getElementById('activeTrackingLabel');
@@ -40,6 +42,7 @@ function MapWithTracking({ page }) {
 
         if (detailsTrackingData?.activeTrackingData) {
             if (detailsTrackingData.activeTrackingData[0]?.SavedAt) {
+
                 const savedAt = detailsTrackingData.activeTrackingData[0].SavedAt;
                 const date = new Date(savedAt);
 
@@ -81,11 +84,8 @@ function MapWithTracking({ page }) {
             const arpId = await FetchActiveARP(user_accountId);
 
             if (arpId) {
-                console.log("Fetched ARP ID:", arpId);
-
                 return new Promise((resolve) => {
                     const unsubscribe = FetchActiveTracking(arpId, (data) => {
-                        console.log("Real-time data:", data);
                         setActiveTrackingData(data);
 
                         if (data && data.length > 0) {
@@ -160,7 +160,6 @@ function MapWithTracking({ page }) {
                     // Start tracking if data is available
                     startTrackingInterval(detailsTrackingData);
 
-                    console.log(detailsTrackingData.activeTrackingData, 'hoy pinoy ako');
                     const text_activeTrackingLabel = document.getElementById('activeTrackingLabel');
 
                     // Ensure `SavedAt` exists in the tracking data
@@ -201,7 +200,7 @@ function MapWithTracking({ page }) {
                 setTracking(true);
 
                 const arpId = await FetchActiveARP(user_accountId);
-                await handleSaveTracking(arpId, ambulanceId, start_cooridnates[1], start_cooridnates[0]);
+                await handleSaveTracking(arpId, ambulanceId, start_cooridnates[1], start_cooridnates[0], accountId);
 
                 console.log("Tracking saved successfully");
 
@@ -237,7 +236,7 @@ function MapWithTracking({ page }) {
                         const { latitude, longitude } = position.coords;
                         console.log("Current Location:", { latitude, longitude });
 
-                        handleUpdateLocation(detailsTrackingData.activeTrackingData[0].trackingId, longitude, latitude)
+                        handleUpdateLocation(detailsTrackingData.activeTrackingData[0].trackingId, longitude, latitude, accountId, ambulanceId)
                             .then(() => console.log("Location updated successfully"))
                             .catch(error => console.error("Error updating location:", error));
                     },
@@ -271,9 +270,18 @@ function MapWithTracking({ page }) {
 
     const handleLocationAndTracking = async () => {
         try {
-            const newStartPoint = await getCurrentLocation(); // Wait for location to be fetched
-            console.log("Fetched Location:", newStartPoint);
-            startTracking(accountId, newStartPoint); // Start tracking after location is fetched
+            if (!ambulanceId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error saving changes!',
+                    text: "Please select an ambulance first.",
+                    confirmButtonText: 'Okay',
+                });
+            } else {
+                const newStartPoint = await getCurrentLocation();
+                startTracking(accountId, newStartPoint);
+            }
+
         } catch (error) {
             console.error("Error fetching location:", error.message);
         }
@@ -286,7 +294,6 @@ function MapWithTracking({ page }) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const newStartPoint = [position.coords.latitude, position.coords.longitude];
-                        console.log("Starting: ", newStartPoint);
                         setStartPoint(newStartPoint); // Update the start point with the user's location
 
                         if (markerRef.current) {

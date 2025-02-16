@@ -14,17 +14,14 @@ function ManageAccount() {
 
     return (
         <>
-            <Routing pageAuth="Admin" setAuthorization={setAuthorization} />
+            {/* <Routing pageAuth="Admin" setAuthorization={setAuthorization} /> */}
 
-            {authorization ? (
-                <>
-                    <NavBar />
-                    <Sidebar />
-                    <ManageAccountsContent />
-                </>
-            ) : (
-                <div>You do not have permission to view this page.</div>
-            )}
+            <>
+                <NavBar />
+                <Sidebar />
+                <ManageAccountsContent />
+            </>
+
         </>
     );
 

@@ -18,14 +18,10 @@ function ARP_PatientCareReport() {
         <>
             <Routing pageAuth="AmbulancePersonnel" setAuthorization={setAuthorization} />
 
-            {authorization ? (
-                <>
-                    <NavBar />
-                    <PatientCareReportContent />
-                </>
-            ) : (
-                <div>You do not have permission to view this page.</div>
-            )}
+            <>
+                <NavBar />
+                <PatientCareReportContent />
+            </>
 
         </>
 

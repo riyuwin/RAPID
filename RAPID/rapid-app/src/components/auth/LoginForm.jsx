@@ -3,7 +3,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { getFirestore, collection, query, where, getDocs } from "firebase/firestore"; // Import Firestore
-import '../../../css/authentication.css';
+/* import '../../../css/authentication.css'; */
 
 function LoginForm() {
     const [email, setEmail] = useState('');
@@ -75,6 +75,8 @@ function LoginForm() {
                 navigate('/admin/dashboard');
             } else if (userData.membership === "AmbulancePersonnel") {
                 navigate('/arp/dashboard');
+            } else if (userData.membership === "EmergencyPersonnel") {
+                navigate('/admin/dashboard');
             }
 
         } catch (error) {
@@ -89,43 +91,71 @@ function LoginForm() {
     };
 
     return (
-        <div className="login_page">
-            <div className="container">
-                <div className="form-wrapper">
-                    <h2 className="title"><br />Welcome Back</h2>
-                    <p className="subtitle">Log in to continue</p>
-                    <form onSubmit={handleLogin} className="form">
+        <div className="login_page d-flex justify-content-center align-items-center vh-100">
+            <div className="login_container">
 
-                        <div className="input-group">
-                            <label htmlFor="email" className="label">Email:</label>
-                            <input
-                                type="email"
-                                id="email"
-                                className="input"
-                                placeholder="Enter your email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                            />
+                <div className="container"  >
+                    <div className="login-form-wrapper"  >
+                        <div className="row">
+                            <div className="col-md-6 " >
+                                <div className="caption_container">
+                                    <img src='assets/img/authbg/ambulance.gif'
+                                        className='ambulance_gif' />
+
+                                    <h2 className="title">RAPID</h2>
+                                    <p className="subtitle">Real-Time Ambulance Patient Information Dissemination: An Application for Immediate Ambulance to Hospital Patient Data and Incident Report Transmission</p>
+                                </div>
+                            </div>
+
+                            <div className="col-md-6"  >
+                                {/* <img src='assets/img/authbg/ambulance.gif'
+                                    className='ambulance_gif' /> */}
+
+                                <div className="login_form_container">
+
+                                    <h2 className="title">LOGIN</h2>
+                                    <p className="subtitle">Login to continue</p>
+                                    <form onSubmit={handleLogin} className="form">
+
+                                        <div className="input-group">
+                                            <label htmlFor="email" className="label">Email:</label>
+                                            <input
+                                                type="email"
+                                                id="email"
+                                                className="input"
+                                                placeholder="Enter your email"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="input-group">
+                                            <label htmlFor="password" className="label">Password:</label>
+                                            <input
+                                                type="password"
+                                                id="password"
+                                                className="input"
+                                                placeholder="Enter your password"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <button type="submit" className="button">Log In</button>
+                                    </form>
+                                    <p className="footer">
+                                        Don't have an account? <a href="/signup" className="link">Sign up</a>
+                                    </p>
+
+                                </div>
+
+                            </div>
                         </div>
-                        <div className="input-group">
-                            <label htmlFor="password" className="label">Password:</label>
-                            <input
-                                type="password"
-                                id="password"
-                                className="input"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <button type="submit" className="button">Log In</button>
-                    </form>
-                    <p className="footer">
-                        Don't have an account? <a href="/signup" className="link">Sign up</a>
-                    </p>
+
+                    </div>
                 </div>
+
+
             </div>
         </div>
     );

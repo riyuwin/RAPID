@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Swal from 'sweetalert2';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import '../../../../css/style.css';
+/* import '../../../../css/style.css'; */
 import { firestore } from '../../../firebase/firebase';
 import { addDoc, collection, getDocs, query, where, doc, onSnapshot, updateDoc, serverTimestamp } from "firebase/firestore";
 import FetchActiveARP from './FetchActiveARP';

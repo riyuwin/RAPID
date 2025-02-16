@@ -1,9 +1,9 @@
 import React from 'react';
 import { firestore } from '../../../firebase/firebase';
-import { doc, updateDoc, arrayUnion } from "firebase/firestore"; // Import updateDoc and arrayUnion
+import { doc, updateDoc, addDoc, collection, serverTimestamp } from "firebase/firestore"; // Import updateDoc and arrayUnion
 import Swal from 'sweetalert2';
 
-export const UpdateTrackingStatus = async (trackingId, tracking_status) => {
+export const UpdateTrackingStatus = async (trackingId, tracking_status, accountId) => {
     try {
 
         // Reference to the specific tracking document using trackingId
@@ -15,6 +15,18 @@ export const UpdateTrackingStatus = async (trackingId, tracking_status) => {
         });
 
         console.log("Tracking updated successfully with ID:", trackingId);
+
+        const notif_docRef = await addDoc(collection(firestore, "NotificationInformation"), {
+            NotificationStatus: "UpdateTrackingStatus",
+            TrackingStatus: tracking_status,
+            TransactionId: trackingId,
+            savedAt: serverTimestamp(),
+            AccountId: accountId,
+        });
+
+        await updateDoc(doc(firestore, "NotificationInformation", notif_docRef.id), {
+            NotificationId: notif_docRef.id,
+        });
 
         // Success feedback to the user
         Swal.fire({

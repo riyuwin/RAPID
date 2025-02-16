@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { firestore } from '../../firebase/firebase'; // Assuming firestore is correctly configured
-import { getDoc, doc, updateDoc } from "@firebase/firestore";
-import '../../../css/style.css';
-import '../../../css/table.css';
+import { getDoc, doc, updateDoc, addDoc, collection, serverTimestamp } from "@firebase/firestore";
+/* import '../../../css/style.css';
+import '../../../css/table.css'; */
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2'; // Import SweetAlert2
+import { useFetchCurrentUser } from '../arp_site/scripts/FetchCurrentUser';
+import { getAuth } from "firebase/auth";
 
 function UserDetailsContent() {
 
@@ -12,20 +14,53 @@ function UserDetailsContent() {
     const [account, setAccount] = useState(null); // State to hold the fetched data
     const [loading, setLoading] = useState(true); // Loading state
 
+
     // Function to update account status in Firestore
     const updateStatus = async (newStatus) => {
         try {
             const docRef = doc(firestore, "AccountInformation", accountId);
             await updateDoc(docRef, { status: newStatus }); // Update the 'status' field in Firestore
-            setAccount((prev) => ({ ...prev, status: newStatus })); // Update local state
+            setAccount((prev) => ({ ...prev, status: newStatus })); // Update local state  
 
-            // Show success SweetAlert
-            Swal.fire({
-                icon: 'success',
-                title: 'Status Updated',
-                text: `Account status has been updated to "${newStatus}".`,
-                confirmButtonText: 'OK',
-            });
+            const auth = getAuth();
+            const currentUser = auth.currentUser; // Get the currently logged-in user
+
+            if (currentUser) {
+                try {
+
+                    const notif_docRef = await addDoc(collection(firestore, "NotificationInformation"), {
+                        NotificationStatus: "UpdateAccount",
+                        TrackingStatus: newStatus,
+                        savedAt: serverTimestamp(),
+                        AccountId: currentUser.uid,
+                        UserAccountID: accountId,
+                    });
+
+                    await updateDoc(doc(firestore, "NotificationInformation", notif_docRef.id), {
+                        NotificationId: notif_docRef.id,
+                    });
+
+                    // Show success SweetAlert
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Updated',
+                        text: `Account status has been updated to "${newStatus}".`,
+                        confirmButtonText: 'OK',
+                    });
+
+                } catch (err) {
+                    console.error("Error updating account status:", err);
+                }
+            } else {
+                console.error("No user is currently logged in.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Authentication Error',
+                    text: 'You must be logged in to update the patient status.',
+                });
+            }
+
+
         } catch (error) {
             console.error("Error updating account status:", error);
 
@@ -87,146 +122,134 @@ function UserDetailsContent() {
                     </nav>
                 </div>
 
-                <div className="h-screen flex-grow-1 overflow-y-lg-auto">
-                    <header className="bg-surface-primary border-bottom pt-6">
-                        <div className="container-fluid">
-                            <div className="mb-npx">
-                                <div className="row align-items-center">
-                                    <div className="col-sm-6 col-12 mb-4 mb-sm-0">
-                                        <h1 className="h2 mb-0 ls-tight"></h1>
-                                    </div>
-                                    <ul className="nav nav-tabs mt-4 overflow-x border-0"></ul>
-                                </div>
-                            </div>
-                        </div>
-                    </header>
-                    <main className="py-6 bg-surface-secondary">
-                        <div className="container-fluid">
-                            <section className="section dashboard">
-                                <div className="row">
+                <hr />
 
-                                    <div className="col-lg-12">
-                                        <div className="row">
-                                            <div className="col-xxl-12 col-md-12">
-                                                <div className="card info-card sales-card">
-                                                    <div className="card-body d-flex flex-column align-items-center justify-content-center">
-                                                        <h5 className="card-title text-center mb-3">
-                                                            User Account Details
+                <main className="py-6  ">
+                    <div className="container-fluid">
+                        <section className="section dashboard">
+                            <div className="row">
+
+                                <div className="col-lg-12">
+                                    <div className="row">
+                                        <div className="col-xxl-12 col-md-12">
+                                            <div className="card info-card sales-card">
+                                                <div className="card-body d-flex flex-column align-items-center justify-content-center">
+                                                    <h5 className="card-title text-center mb-3">
+                                                        User Account Details
+                                                        <hr />
+                                                    </h5>
+
+                                                    <div className="row w-100 mb-3 justify-content-start">
+                                                        <div className="col-12 col-md-12 d-flex flex-column align-items-center justify-content-center">
+                                                            <div className="card-icon rounded-circle d-flex align-items-center justify-content-center mb-3">
+                                                                <img src="../../assets/img/med_logo.png" alt="User" className="img-fluid" />
+                                                            </div>
+                                                            <br></br>
+                                                            <h6 className="mb-1 text-center">{account.firstName} {account.lastName}</h6>
+                                                            <h7>{account.email}</h7>
+                                                            <span className="text-muted small text-center">Account Status: <b>{account.status || "Unknown"}</b></span>
+                                                        </div>
+
+                                                        <div className="col-12 col-md-12 d-flex flex-column align-items-center justify-content-center">
                                                             <hr />
-                                                        </h5>
-
-                                                        <div className="row w-100 mb-3 justify-content-start">
-                                                            <div className="col-12 col-md-12 d-flex flex-column align-items-center justify-content-center">
-                                                                <div className="card-icon rounded-circle d-flex align-items-center justify-content-center mb-3">
-                                                                    <img src="../../assets/img/med_logo.png" alt="User" className="img-fluid" />
-                                                                </div>
-                                                                <br></br>
-                                                                <h6 className="mb-1 text-center">{account.firstName} {account.lastName}</h6>
-                                                                <h7>{account.email}</h7>
-                                                                <span className="text-muted small text-center">Account Status: <b>{account.status || "Unknown"}</b></span>
-                                                            </div>
-
-                                                            <div className="col-12 col-md-12 d-flex flex-column align-items-center justify-content-center">
-                                                                <hr />
-                                                                <div className="d-flex justify-content-around mt-3 w-auto">
-                                                                    <button
-                                                                        className="btn btn-verified"
-                                                                        onClick={() => updateStatus("Verified")}
-                                                                    >
-                                                                        Verified
-                                                                    </button>
-                                                                    <button
-                                                                        className="btn btn-pending"
-                                                                        onClick={() => updateStatus("Pending")}
-                                                                    >
-                                                                        Pending
-                                                                    </button>
-                                                                    <button
-                                                                        className="btn btn-deactivate"
-                                                                        onClick={() => updateStatus("Deactivated")}
-                                                                    >
-                                                                        Deactivate
-                                                                    </button>
-                                                                </div>
+                                                            <div className="d-flex justify-content-around mt-3 w-auto">
+                                                                <button
+                                                                    className="btn btn-verified"
+                                                                    onClick={() => updateStatus("Verified")}
+                                                                >
+                                                                    Verified
+                                                                </button>
+                                                                <button
+                                                                    className="btn btn-pending"
+                                                                    onClick={() => updateStatus("Pending")}
+                                                                >
+                                                                    Pending
+                                                                </button>
+                                                                <button
+                                                                    className="btn btn-deactivate"
+                                                                    onClick={() => updateStatus("Deactivated")}
+                                                                >
+                                                                    Deactivate
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            {/* Add the remaining cards and sections here */}
                                         </div>
+                                        {/* Add the remaining cards and sections here */}
                                     </div>
-
-                                    <div className="col-lg-12">
-                                        <div className="row">
-
-                                            <div className="col-xxl-12 col-md-12">
-                                                <div className="card info-card sales-card">
-                                                    <div className="card-body d-flex flex-column align-items-center justify-content-center">
-
-                                                        <div className="row w-100 mb-3 justify-content-start">
-                                                            <div className="col-12 col-md-12 d-flex flex-column align-items-start justify-content-start">
-                                                                <br></br>
-                                                                <span className="text-muted small text-center"><b style={{ color: '#202020' }}>Basic Information</b></span>
-                                                                <br></br>
-                                                            </div>
-                                                            <hr></hr>
-
-                                                            <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
-                                                                <span className="text-muted small text-center">First Name: </span>
-                                                                <h7 className="mb-1 text-center custom-name">{account.firstName}</h7>
-                                                            </div>
-
-                                                            <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
-                                                                <span className="text-muted small text-center">Middle Name: </span>
-                                                                <h7 className="mb-1 text-center custom-name">{account.middleName || "N/A"}</h7>
-                                                            </div>
-
-                                                            <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
-                                                                <span className="text-muted small text-center">Last Name: </span>
-                                                                <h7 className="mb-1 text-center custom-name">{account.lastName}</h7>
-                                                                <br></br>
-                                                            </div>
-
-                                                            <hr></hr>
-
-                                                            <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
-                                                                <span className="text-muted small text-center">Gender: </span>
-                                                                <h7 className="mb-1 text-center custom-name">{account.gender || "N/A"}</h7>
-                                                            </div>
-
-                                                            <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
-                                                                <span className="text-muted small text-center">Birthdate: </span>
-                                                                <h7 className="mb-1 text-center custom-name">{account.birthday || "N/A"}</h7>
-                                                            </div>
-
-                                                            <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
-                                                                <span className="text-muted small text-center">Email: </span>
-                                                                <h7 className="mb-1 text-center custom-name">{account.email}</h7>
-                                                                <br></br>
-                                                            </div>
-
-                                                            <hr></hr>
-
-                                                            <div className="col-12 col-md-12 d-flex flex-column align-items-start justify-content-start">
-                                                                <span className="text-muted small text-center">Address: </span>
-                                                                <h7 className="mb-1 text-center custom-name">{account.address || "N/A"}</h7>
-                                                            </div>
-
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {/* Add the remaining cards and sections here */}
-                                        </div>
-                                    </div>
-                                    {/* Add other sections */}
                                 </div>
-                            </section>
-                        </div>
-                    </main>
-                </div>
+
+                                <div className="col-lg-12">
+                                    <div className="row">
+
+                                        <div className="col-xxl-12 col-md-12">
+                                            <div className="card info-card sales-card">
+                                                <div className="card-body d-flex flex-column align-items-center justify-content-center">
+
+                                                    <div className="row w-100 mb-3 justify-content-start">
+                                                        <div className="col-12 col-md-12 d-flex flex-column align-items-start justify-content-start">
+                                                            <br></br>
+                                                            <span className="text-muted small text-center"><b style={{ color: '#202020' }}>Basic Information</b></span>
+                                                            <br></br>
+                                                        </div>
+                                                        <hr></hr>
+
+                                                        <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
+                                                            <span className="text-muted small text-center">First Name: </span>
+                                                            <h7 className="mb-1 text-center custom-name">{account.firstName}</h7>
+                                                        </div>
+
+                                                        <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
+                                                            <span className="text-muted small text-center">Middle Name: </span>
+                                                            <h7 className="mb-1 text-center custom-name">{account.middleName || "N/A"}</h7>
+                                                        </div>
+
+                                                        <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
+                                                            <span className="text-muted small text-center">Last Name: </span>
+                                                            <h7 className="mb-1 text-center custom-name">{account.lastName}</h7>
+                                                            <br></br>
+                                                        </div>
+
+                                                        <hr></hr>
+
+                                                        <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
+                                                            <span className="text-muted small text-center">Gender: </span>
+                                                            <h7 className="mb-1 text-center custom-name">{account.gender || "N/A"}</h7>
+                                                        </div>
+
+                                                        <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
+                                                            <span className="text-muted small text-center">Birthdate: </span>
+                                                            <h7 className="mb-1 text-center custom-name">{account.birthday || "N/A"}</h7>
+                                                        </div>
+
+                                                        <div className="col-4 col-md-4 d-flex flex-column align-items-start justify-content-start">
+                                                            <span className="text-muted small text-center">Email: </span>
+                                                            <h7 className="mb-1 text-center custom-name">{account.email}</h7>
+                                                            <br></br>
+                                                        </div>
+
+                                                        <hr></hr>
+
+                                                        <div className="col-12 col-md-12 d-flex flex-column align-items-start justify-content-start">
+                                                            <span className="text-muted small text-center">Address: </span>
+                                                            <h7 className="mb-1 text-center custom-name">{account.address || "N/A"}</h7>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {/* Add the remaining cards and sections here */}
+                                    </div>
+                                </div>
+                                {/* Add other sections */}
+                            </div>
+                        </section>
+                    </div>
+                </main>
             </main>
         </>
     );

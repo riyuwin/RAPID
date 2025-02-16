@@ -17,14 +17,10 @@ function LocationTracking() {
         <>
             <Routing pageAuth="AmbulancePersonnel" setAuthorization={setAuthorization} />
 
-            {authorization ? (
-                <>
-                    <NavBar />
-                    <LocationTrackingContent />
-                </>
-            ) : (
-                <div>You do not have permission to view this page.</div>
-            )}
+            <>
+                <NavBar />
+                <LocationTrackingContent />
+            </>
         </>
 
     );

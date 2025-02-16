@@ -13,17 +13,14 @@ function Dashboard() {
 
     return (
         <>
-            <Routing pageAuth="Admin" setAuthorization={setAuthorization} />
+            {/* <Routing pageAuth="Admin" setAuthorization={setAuthorization} /> */}
 
-            {authorization ? (
-                <>
-                    <NavBar />
-                    <Sidebar />
-                    <DashboardContent />
-                </>
-            ) : (
-                <div>You do not have permission to view this page.</div>
-            )}
+            <>
+                <NavBar />
+                <Sidebar />
+                <DashboardContent />
+            </>
+
         </>
     );
 }

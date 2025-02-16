@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../../../css/style.css';
+/* import '../../../css/style.css'; */
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { firestore } from '../../firebase/firebase';
@@ -35,7 +35,6 @@ function ARP_DashboardContent() {
     const [accountDocId, setAccountDocId] = useState(null);
     const { accountId, currentUserloading } = useFetchCurrentUser();
     const [editPatientID, setPatientID] = useState("");
-    const [showSubmit, setShowSubmit] = useState(true);
     const [arpId, setArpId] = useState(null);
     const [trackingData, setTrackingData] = useState(null);
 
@@ -43,17 +42,12 @@ function ARP_DashboardContent() {
     const [selectedTrackingData, setSelectedTrackingData] = useState(null);
     const [coordinatesDetails, setCoordinatesDetails] = useState([]);
 
-    console.log("Haaaa", accountId)
-
-
     const fetchActiveARP = async (user_accountId) => {
         try {
             // Fetch the ARP ID first
             const arpId = await FetchActiveARP(user_accountId);
 
             if (arpId) {
-                console.log("Fetched ARP ID1222:", arpId);
-
                 setArpId(arpId); // Set the ARP document ID
 
                 return { arpId }
@@ -69,13 +63,8 @@ function ARP_DashboardContent() {
     // Define a callback to handle real-time updates
     const handleRealtimeUpdates = (data) => {
         if (data.length > 0) {
-            console.log("Real-time data:", data);
-            // Update your state or UI with the new data
-
-
             if (data && data.length > 0) {
                 setCoordinatesDetails(data[0].coordinates)
-
                 return { data };
 
             } else {
@@ -93,21 +82,7 @@ function ARP_DashboardContent() {
             const arpId = await FetchActiveARP(user_accountId);
 
             if (arpId) {
-                console.log("Fetched ARP ID:", arpId);
-
                 const unsubscribe = FetchActiveTracking(arpId, handleRealtimeUpdates);
-
-                // Fetch active tracking data using the ARP ID
-                /* const activeTrackingData = await FetchActiveTracking(arpId);
-
-                if (activeTrackingData && activeTrackingData.length > 0) {
-                    setCoordinatesDetails(activeTrackingData[0].coordinates)
-
-                    return { activeTrackingData };
-
-                } else {
-                    console.log("No active tracking data found.");
-                } */
             } else {
                 console.log("No matching ARP ID found.");
             }
@@ -124,14 +99,8 @@ function ARP_DashboardContent() {
         }
     }, [accountId])
 
-    console.log(arpId, 'asfsafsa121212')
-
-
-
     useEffect(() => {
         if (accountId) {
-            console.log("Fetched accountId:", accountId);
-
             fetchData(accountId)
         }
     }, [accountId]);
@@ -139,21 +108,20 @@ function ARP_DashboardContent() {
 
 
     const handleEditClick = (patientId) => {
+
+        console.log("HEHE", patientId)
+
         ResetForms();
-        setShowSubmit(true);
         // Call the fetch function and log the data
         PatientCareReportFetcher(patientId, (data, err) => {
             if (err) {
                 console.error("Error fetching data:", err);
             } else {
-                console.log("Fetched data from Firestore:", data); // Log fetched data
-                console.log("Basic Information: ", data[0].basicInformation); // Log fetched data
 
                 // Ensure valid data is passed to PopulatePatientCareReport
                 if (data && data.length > 0) {
                     setPatientID(patientId)
                     PopulatePatientCareReport(data);
-                    handleActionButtonClick("Edit")
                 } else {
                     console.error("No data returned for patient ID:", patientId);
                 }
@@ -170,7 +138,6 @@ function ARP_DashboardContent() {
 
         const fetchAccountDetails = async () => {
             try {
-                console.log("Fetching account details for accountId:", accountId);
                 setLoading(true);
 
                 const accountsRef = collection(firestore, "AccountInformation");
@@ -248,6 +215,7 @@ function ARP_DashboardContent() {
     }
 
 
+
     return (
         <>
             <div className="main_arp">
@@ -310,11 +278,13 @@ function ARP_DashboardContent() {
 
                                             <hr />
 
-                                            <button className="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                            {/* <button className="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal"
                                                 onClick={() => handleEditClick(patient.id)}>
                                                 <i className="bx bx-edit-alt"
                                                     style={{ marginTop: "5px" }}></i> Edit
-                                            </button>
+                                            </button> */}
+
+                                            <EditAmbulanceModal />
 
                                         </div>
                                     </div>
@@ -366,7 +336,6 @@ function ARP_DashboardContent() {
 
 
                         {/* Modal for selecting ambulance */}
-                        <EditAmbulanceModal />
 
 
                     </div>

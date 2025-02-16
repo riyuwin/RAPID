@@ -21,21 +21,21 @@ export const Routing = ({ pageAuth, setAuthorization }) => {
                     setLoading(false); // Stop loading once data is fetched
 
                     if (doc.data().membership !== pageAuth) {
-                        console.log("Bawal ka dito", pageAuth);
                         setAuthorization(false); // Set authorization to false
                         window.location.href = '/forbidden'; // Redirect to forbidden page
                     } else {
-                        console.log("Pwede ka dito");
                         setAuthorization(true); // Set authorization to true
                     }
                 } else {
                     console.error("No account found with the matching accountId.");
                     setLoading(false); // Stop loading if no document is found
                     setMembership(null);
+                    window.location.href = '/forbidden'; // Redirect to forbidden page
                 }
             }, (error) => {
                 console.error("Error fetching data:", error);
                 setLoading(false);
+                window.location.href = '/forbidden'; // Redirect to forbidden page
             });
 
             // Clean up the listener when the component is unmounted

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import '../../../css/style.css';
+/* import '../../../css/style.css'; */
 import { firestore } from '../../firebase/firebase';
 import { addDoc, collection, getDocs, query, where, doc, onSnapshot, updateDoc, serverTimestamp } from "firebase/firestore";
 import Swal from 'sweetalert2';
 import { useFetchCurrentUser } from './scripts/FetchCurrentUser';
-
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { Modal } from "bootstrap";
 
 function EditAmbulanceModal() {
     const [account, setAccount] = useState(null);
@@ -23,7 +25,6 @@ function EditAmbulanceModal() {
 
         const fetchAccountDetails = async () => {
             try {
-                console.log("Fetching account details for accountId:", accountId);
                 setLoading(true);
 
                 const accountsRef = collection(firestore, "AccountInformation");
@@ -98,7 +99,8 @@ function EditAmbulanceModal() {
             if (selectedAmbulanceId) {
                 const accountRef = doc(firestore, "AccountInformation", accountDocId);
                 await updateDoc(accountRef, {
-                    ambulanceId: selectedAmbulanceId
+                    ambulanceId: selectedAmbulanceId,
+                    updatedAt: serverTimestamp(),
                 });
                 Swal.fire('Changes Saved!', '', 'success').then(() => {
                     // Reload the page after SweetAlert
@@ -113,8 +115,30 @@ function EditAmbulanceModal() {
         }
     };
 
+    const handleOpenModal = () => {
+        // Get the modal element
+        /* const modalElement = document.getElementById('exampleModal'); */
+
+        const modal = new Modal(document.getElementById("exampleModal"));
+        modal.show();
+
+        /* if (modalElement) {
+            // Create a new Bootstrap modal instance and show it
+            const bootstrapModal = new bootstrap.Modal(modalElement);
+            bootstrapModal.show();
+        } */
+    };
+
     return (
         <>
+
+            <button className="btn btn-success btn-sm"
+                /* data-bs-toggle="modal" data-bs-target="#exampleModal" */
+                onClick={handleOpenModal}>
+                <i className="bx bx-edit-alt"
+                    style={{ marginTop: "5px" }}></i> Edit
+            </button>
+
             {/* Modal for selecting ambulance */}
             <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
@@ -124,7 +148,11 @@ function EditAmbulanceModal() {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceSelect">Select Ambulance:</label>
+                            <div className="d-flex justify-content-start">
+                                <label style={{ color: 'black', marginBottom: '10px' }} htmlFor="ambulanceSelect">
+                                    Select Ambulance:
+                                </label>
+                            </div>
 
                             <select
                                 id="ambulanceSelect"

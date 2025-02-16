@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { addDoc, collection } from "@firebase/firestore";
 import { firestore } from '../../firebase/firebase';
-import '../../../css/authentication.css';
+/* import '../../../css/authentication.css'; */
 
 function AccountPendingContent() {
 

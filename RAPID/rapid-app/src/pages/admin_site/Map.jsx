@@ -15,17 +15,14 @@ function Map() {
     return (
 
         <>
-            <Routing pageAuth="Admin" setAuthorization={setAuthorization} />
+            {/* <Routing pageAuth="Admin" setAuthorization={setAuthorization} /> */}
 
-            {authorization ? (
-                <>
-                    <NavBar />
-                    <Sidebar />
-                    <MapContent />
-                </>
-            ) : (
-                <div>You do not have permission to view this page.</div>
-            )}
+            <>
+                <NavBar />
+                <Sidebar />
+                <MapContent />
+            </>
+
         </>
 
     );

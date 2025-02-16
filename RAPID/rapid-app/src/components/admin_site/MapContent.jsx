@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import '../../../css/style.css';
-import '../../../css/style3.css';
+/* import '../../../css/style.css';
+import '../../../css/style3.css'; */
 
 
 function MapContent() {

@@ -1,4 +1,4 @@
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot, documentId } from "firebase/firestore";
 import { firestore } from "../../../firebase/firebase";
 
 export const PopulatePatientCareReport = async (patientCareDetails) => {
@@ -8,8 +8,6 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
             console.error("Invalid patient care details");
             return;
         }
-
-        console.log("hello ", patientCareDetails)
 
         const callDetsMapping = {
             callReceived: "callReceived",
@@ -28,7 +26,8 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
             age: "ageInput",
             gender: "genderSelect",
             birthdate: "birthdateInput",
-            nationality: "nationalitySelect"
+            nationality: "nationalitySelect",
+            addressInput: "addressInput",
         };
 
         const triageTagging = {
@@ -54,6 +53,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
         const obs_gnyae = {
             obsGynHaemorrhage: "obsGynHaemorrhage",
+            obsGynHaemorrhageLess: "obsGynHaemorrhageLess",
             obsGynLabour: "obsGynLabour",
             obsGynPPH: "obsGynPPH",
             obsGynPreDelivery: "obsGynPreDelivery",
@@ -138,7 +138,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
             circumstancesSelfHarm: "circumstancesSelfHarm",
         };
 
-        const clinical = {
+        const clinicalStatus = {
             clinicalLifeThreatening: "clinicalLifeThreatening",
             clinicalSerious: "clinicalSerious",
             clinicalNonSerious: "clinicalNonSerious",
@@ -307,6 +307,8 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
         const wound = {
             "bleedingControl": "bleedingControl",
             "appliedAntiseptic": "appliedAntiseptic",
+            "cleaning": "cleaning",
+            "dressingBandaging": "dressingBandaging",
         };
 
         const care = {
@@ -339,6 +341,56 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
             "rashes": "rashes",
             "numbness": "numbness",
         };
+
+        const characterModel = {
+            "rightHead": "rightHead",
+            "rightNeck": "rightNeck",
+            "rightShoulder": "rightShoulder",
+            "rightChest": "rightChest",
+            "rightArm": "rightArm",
+            "rightHand": "rightHand",
+            "rightAbdomen": "rightAbdomen",
+            "rightHip": "rightHip",
+            "rightThigh": "rightThigh",
+            "rightKnee": "rightKnee",
+            "rightShin": "rightShin",
+            "rightFoot": "rightFoot",
+            "leftHead": "leftHead",
+            "leftNeck": "leftNeck",
+            "leftShoulder": "leftShoulder",
+            "leftChest": "leftChest",
+            "leftArm": "leftArm",
+            "leftHand": "leftHand",
+            "leftAbdomen": "leftAbdomen",
+            "leftHip": "leftHip",
+            "leftThigh": "leftThigh",
+            "leftKnee": "leftKnee",
+            "leftShin": "leftShin",
+            "leftFoot": "leftFoot",
+
+            "rightBackHead": "rightBackHead",
+            "rightBackNeck": "rightBackNeck",
+            "rightBackShoulder": "rightBackShoulder",
+            "rightBackArm": "rightBackArm",
+            "rightBackHand": "rightBackHand",
+            "rightBackUpperBack": "rightBackUpperBack",
+            "rightBackLowerBack": "rightBackLowerBack",
+            "rightBackHip": "rightBackHip",
+            "rightBackThigh": "rightBackThigh",
+            "rightCalf": "rightCalf",
+            "rightBackFoot": "rightBackFoot",
+            "leftBackHead": "leftBackHead",
+            "leftBackNeck": "leftBackNeck",
+            "leftBackShoulder": "leftBackShoulder",
+            "leftBackArm": "leftBackArm",
+            "leftBackHand": "leftBackHand",
+            "leftBackUpperBack": "leftBackUpperBack",
+            "leftBackLowerBack": "leftBackLowerBack",
+            "leftBackHip": "leftBackHip",
+            "leftBackThigh": "leftBackThigh",
+            "leftCalf": "leftCalf",
+            "leftBackFoot": "leftBackFoot",
+        }
 
         const endorsedTeam = {
             "endorsedByTeam": "endorsedByTeam",
@@ -387,7 +439,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
         const part1 = {
             "selfAccident": "selfAccident",
             "motorVehicleCollision": "motorVehicleCollision",
-            "incidentSummary": "incidentSummary",
+            "collision_incidentSummary": "collision_incidentSummary",
         };
 
         const severity = {
@@ -422,7 +474,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
         const classification = {
             "classificationPrivate": "classificationPrivate",
-            "vehicularAccidentDetails": "vehicularAccidentDetails",
+            "classificationPublic": "classificationPublic",
             "classificationGovernment": "classificationGovernment",
             "classificationDiplomat": "classificationDiplomat",
         };
@@ -431,7 +483,9 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
             "motorcycle": "motorcycle",
             "bike": "bike",
             "jeepney": "jeepney",
+            "ambulance": "ambulance",
             "heavyEquipment": "heavyEquipment",
+            "aircraft": "aircraft",
             "tricycle": "tricycle",
             "eBike": "eBike",
             "horseDriven": "horseDriven",
@@ -479,6 +533,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
             "damageFront": "damageFront",
             "damageLeft": "damageLeft",
             "damageOthers": "damageOthers",
+            "damageOthersInput": "damageOthersInput",
         };
 
         const defect = {
@@ -490,6 +545,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
             "defectLights": "defectLights",
             "defectTires": "defectTires",
             "defectOthers": "defectOthers",
+            "defectOthersInput": "defectOthersInput",
         };
 
         const loading = {
@@ -540,6 +596,9 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
             "seatbeltHelmetNoSeatbelt": "seatbeltHelmetNoSeatbelt",
         };
 
+        console.log("hello ", patientCareDetails)
+
+
         // Check and populate `callDets` data
         if (patientCareDetails[0].callDets) {
             Object.entries(callDetsMapping).forEach(([firestoreField, inputId]) => {
@@ -562,7 +621,26 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
                 if (value !== undefined && value !== null) {
                     const inputElement = document.getElementById(inputId);
                     if (inputElement) {
-                        inputElement.value = value;
+                        const inputValue = inputElement.value = value;
+
+                        if (patientCareDetails.length > 0 && patientCareDetails[0].basicInformation) {
+                            const nationality = patientCareDetails[0].basicInformation['nationality'];
+                            const nationalitySelect = document.getElementById('nationalitySelect');
+                            const otherNationality = document.getElementById('otherNationality');
+
+                            if (nationalitySelect) {
+                                if (nationality !== "Filipino") {
+                                    nationalitySelect.value = "Other";
+                                    otherNationality.value = nationality;
+                                }
+                            } else {
+                                console.error("Nationality select or input field not found in the DOM.");
+                            }
+                        } else {
+                            console.error("patientCareDetails is empty or missing basicInformation.");
+                        }
+
+
                     } else {
                         console.warn(`Input element with ID '${inputId}' not found`);
                     }
@@ -658,7 +736,6 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             const isChecked = document.getElementById('otherNeurological').checked = true;
-                            console.log(isChecked)
                             inputElement.value = value; // Set the input field value (for text inputs)
                         }
                     } else {
@@ -681,7 +758,6 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             const isChecked = document.getElementById('otherTrauma').checked = true;
-                            console.log(isChecked)
                             inputElement.value = value; // Set the input field value (for text inputs)
                         }
                     } else {
@@ -704,7 +780,6 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             const isChecked = document.getElementById('mechanismInjuryOther').checked = true;
-                            console.log(isChecked)
                             inputElement.value = value; // Set the input field value (for text inputs)
                         }
                     } else {
@@ -727,7 +802,6 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             const isChecked = document.getElementById('medicalOther').checked = true;
-                            console.log(isChecked)
                             inputElement.value = value; // Set the input field value (for text inputs)
                         }
                     } else {
@@ -749,7 +823,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
                         if (inputElement.type === "checkbox") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
-                            const isChecked = document.getElementById('respiratoryOtherInput').checked = true;
+                            const isChecked = document.getElementById('respiratoryOther').checked = true;
                             console.log(isChecked)
                             inputElement.value = value; // Set the input field value (for text inputs)
                         }
@@ -773,7 +847,6 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             const isChecked = document.getElementById('generalOther').checked = true;
-                            console.log(isChecked)
                             inputElement.value = value; // Set the input field value (for text inputs)
                         }
                     } else {
@@ -805,9 +878,9 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
         }
 
         // Check and populate `natureCall` data if needed
-        if (patientCareDetails[0].clinical) {
-            Object.entries(clinical).forEach(([firestoreField, inputId]) => {
-                const value = patientCareDetails[0].clinical[firestoreField]; // Get Firestore value
+        if (patientCareDetails[0].clinicalStatus) {
+            Object.entries(clinicalStatus).forEach(([firestoreField, inputId]) => {
+                const value = patientCareDetails[0].clinicalStatus[firestoreField]; // Get Firestore value
                 if (value !== undefined && value !== null) { // Check for valid value
                     const inputElement = document.getElementById(inputId);
 
@@ -817,7 +890,6 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             const isChecked = document.getElementById('generalOther').checked = true;
-                            console.log(isChecked)
                             inputElement.value = value; // Set the input field value (for text inputs)
                         }
                     } else {
@@ -1165,6 +1237,27 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
         }
 
         // Check and populate `natureCall` data if needed
+        if (patientCareDetails[0].characterModel) {
+            Object.entries(characterModel).forEach(([firestoreField, inputId]) => {
+                const value = patientCareDetails[0].characterModel[firestoreField]; // Get Firestore value
+                if (value !== undefined && value !== null) { // Check for valid value
+                    const inputElement = document.getElementById(inputId);
+
+                    if (inputElement) {
+                        // Check if the input is a checkbox
+                        if (inputElement.type === "checkbox") {
+                            inputElement.checked = value; // Set the checkbox state based on the value
+                        } else {
+                            inputElement.value = value; // Set the input field value (for text inputs)
+                        }
+                    } else {
+                        console.warn(`Input element with ID '${inputId}' not found`);
+                    }
+                }
+            });
+        }
+
+        // Check and populate `natureCall` data if needed
         if (patientCareDetails[0].endorsedTeam) {
             Object.entries(endorsedTeam).forEach(([firestoreField, inputId]) => {
                 const value = patientCareDetails[0].endorsedTeam[firestoreField]; // Get Firestore value
@@ -1428,6 +1521,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
                         if (inputElement.type === "checkbox") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
+                            const isChecked = document.getElementById('damageOthers').checked = true;
                             inputElement.value = value; // Set the input field value (for text inputs)
                         }
                     } else {
@@ -1449,6 +1543,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
                         if (inputElement.type === "checkbox") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
+                            const isChecked = document.getElementById('defectOthers').checked = true;
                             inputElement.value = value; // Set the input field value (for text inputs)
                         }
                     } else {

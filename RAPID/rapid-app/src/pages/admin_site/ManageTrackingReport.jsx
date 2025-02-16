@@ -14,17 +14,14 @@ function ManageTrackingReport() {
 
     return (
         <>
-            <Routing pageAuth="Admin" setAuthorization={setAuthorization} />
+            {/* <Routing pageAuth="Admin" setAuthorization={setAuthorization} /> */}
 
-            {authorization ? (
-                <>
-                    <NavBar />
-                    <Sidebar />
-                    <ManageTrackingReportContent />
-                </>
-            ) : (
-                <div>You do not have permission to view this page.</div>
-            )}
+            <>
+                <NavBar />
+                <Sidebar />
+                <ManageTrackingReportContent />
+            </>
+
         </>
     );
 

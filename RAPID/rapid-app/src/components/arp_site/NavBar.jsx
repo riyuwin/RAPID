@@ -1,17 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
-import '../../../css/style.css';
-import '../../../css/style3.css';
 import { collection, query, where, getDocs } from "@firebase/firestore";
 import { firestore } from '../../firebase/firebase';
+import { Link } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
+import { Dropdown } from "bootstrap";
+
+
+
 
 function NavBar() {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const [account, setAccount] = useState(null); // Track user account details
     const [loading, setLoading] = useState(true); // Track loading state
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
+        dropdownElementList.forEach(dropdown => {
+            new Dropdown(dropdown);
+        });
+    }, []);
 
     useEffect(() => {
         const auth = getAuth();
@@ -21,7 +32,6 @@ function NavBar() {
             if (user) {
                 setIsUserLoggedIn(true);
                 const currentUid = user.uid;
-
 
                 try {
                     // Fetch account data from Firestore
@@ -46,6 +56,10 @@ function NavBar() {
             }
         });
 
+        // Initialize dropdowns after the component is mounted
+        /* const dropdownElements = document.querySelectorAll('.dropdown-toggle');
+        dropdownElements.forEach((dropdown) => new Dropdown(dropdown)); */
+
         return () => unsubscribe();
     }, []);
 
@@ -61,51 +75,48 @@ function NavBar() {
         <>
             <header id="header" className="header fixed-top d-flex align-items-center">
                 <div className="d-flex align-items-center justify-content-center">
-                    <a href="/" className="logo d-flex align-items-center mx-auto">
+                    <Link to="/arp/dashboard" className="logo d-flex align-items-center mx-auto">
                         <img src="../../assets/img/med_logo.png" alt="Logo" />
                         <span className="d-none d-lg-block">RAPID</span>
-                    </a>
+                    </Link>
                 </div>
-
-                {/* <div className="search-bar">
-                    <form className="search-form d-flex align-items-center" method="POST" action="#">
-                        <input
-                            type="text"
-                            id="searchInput"
-                            name="query"
-                            placeholder="Search"
-                            title="Enter search keyword"
-                        />
-                        <button type="submit" title="Search">
-                            <i className="bi bi-search"></i>
-                        </button>
-                        <ul id="searchSuggestions"></ul>
-                    </form>
-                </div> */}
 
                 <nav className="header-nav ms-auto">
                     <ul className="d-flex align-items-center">
-                        <li className="nav-item d-block d-lg-none">
-                            <a className="nav-link nav-icon search-bar-toggle" href="#">
-                                <i className="bi bi-search"></i>
-                            </a>
-                        </li>
                         <li className="nav-item dropdown pe-3">
-                            <a
-                                className="nav-link nav-profile d-flex align-items-center pe-0"
-                                href="#"
-                                data-bs-toggle="dropdown"
+
+                            <Link
+                                className="nav-link nav-profile d-flex align-items-center justify-content-center pe-0 "
+                                to="/arp/notification"
                             >
-                                <p className="navbarUserName">
-                                    {account ? `Welcome back, ${account.firstName}!` : 'Welcome!'}
+                                <img
+                                    src="/assets/img/notif-sym.png"
+                                    alt="Profile"
+                                    id="navbarProfilePicture"
+                                    className="rounded-circle"
+                                    style={{ width: "25px", height: "25px" }}
+                                />
+                            </Link>
+                        </li>
+
+                        <li className="nav-item dropdown pe-3">
+                            <button
+                                className="nav-link nav-profile d-flex align-items-center justify-content-center pe-0"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                <p className="navbarUserName mb-0 me-2">
+                                    {account ? `Hi, ${account.firstName}!` : 'Welcome!'}
                                 </p>
                                 <img
-                                    src="../../assets/img/user_default.png"
+                                    src="/assets/img/profile.png"
                                     alt="Profile"
                                     id="navbarProfilePicture"
                                     className="rounded-circle"
                                 />
-                            </a>
+                            </button>
+
+
                             <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                                 <li className="dropdown-header">
                                     <h6>{account ? account.firstName : 'Guest'}</h6>
@@ -115,31 +126,33 @@ function NavBar() {
                                     <hr className="dropdown-divider" />
                                 </li>
                                 <li>
-                                    <a className="dropdown-item d-flex align-items-center" href="/arp/dashboard">
+                                    <Link className="dropdown-item d-flex align-items-center" to="/arp/profile">
                                         <i className="bi bi-person"></i>
                                         <span>My Profile</span>
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
                                     <hr className="dropdown-divider" />
                                 </li>
                                 {isUserLoggedIn ? (
                                     <li>
-                                        <a className="dropdown-item d-flex align-items-center" onClick={handleLogout}>
+                                        <button className="dropdown-item d-flex align-items-center" onClick={handleLogout}>
                                             <i className="bi bi-box-arrow-right"></i>
                                             <span>Logout</span>
-                                        </a>
+                                        </button>
                                     </li>
                                 ) : (
                                     <li>
-                                        <a className="dropdown-item d-flex align-items-center" href="/login">
+                                        <Link className="dropdown-item d-flex align-items-center" to="/login">
                                             <i className="bi bi-box-arrow-right"></i>
                                             <span>Login</span>
-                                        </a>
+                                        </Link>
                                     </li>
                                 )}
                             </ul>
                         </li>
+
+
                     </ul>
                 </nav>
             </header>

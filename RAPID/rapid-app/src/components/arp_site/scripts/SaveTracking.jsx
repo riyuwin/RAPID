@@ -1,9 +1,9 @@
 import React from 'react';
 import { firestore } from '../../../firebase/firebase';
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import Swal from 'sweetalert2';
 
-export const handleSaveTracking = async (arp_id, ambulanceId, longitude, latitude) => {
+export const handleSaveTracking = async (arp_id, ambulanceId, longitude, latitude, accountId) => {
     try {
         // Generate current date and time as a string
         const timestamp = new Date().toISOString(); // ISO format (e.g., "2025-01-07T12:34:56.789Z")
@@ -24,6 +24,19 @@ export const handleSaveTracking = async (arp_id, ambulanceId, longitude, latitud
         // Update the document with the trackingId field
         await updateDoc(doc(firestore, "TrackingInformation", docRef.id), {
             trackingId: docRef.id,
+        });
+
+        const notif_docRef = await addDoc(collection(firestore, "NotificationInformation"), {
+            NotificationStatus: "TrackingLocation",
+            TrackingStatus: "Started Location Tracking",
+            TransactionId: docRef.id,
+            AmbulanceId: ambulanceId,
+            savedAt: serverTimestamp(),
+            AccountId: accountId,
+        });
+
+        await updateDoc(doc(firestore, "NotificationInformation", notif_docRef.id), {
+            NotificationId: notif_docRef.id,
         });
 
         // Success feedback to the user

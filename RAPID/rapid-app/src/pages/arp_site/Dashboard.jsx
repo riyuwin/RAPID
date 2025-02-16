@@ -16,14 +16,10 @@ function ARP_Dashboard() {
         <>
             <Routing pageAuth="AmbulancePersonnel" setAuthorization={setAuthorization} />
 
-            {authorization ? (
-                <>
-                    <NavBar />
-                    <ARP_DashboardContent />
-                </>
-            ) : (
-                <div>You do not have permission to view this page.</div>
-            )}
+            <>
+                <NavBar />
+                <ARP_DashboardContent />
+            </>
         </>
 
     );
