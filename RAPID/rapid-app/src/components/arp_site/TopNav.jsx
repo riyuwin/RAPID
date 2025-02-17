@@ -22,7 +22,7 @@ function TopNav() {
                         className={`btn btn-link ${isActive('/arp/dashboard') ? 'active' : ''}`}
                         style={{ marginRight: '10px' }}
                         to="/arp/dashboard"
-                    /* onClick={() => { handleNavigation("/arp/dashboard") }} */
+                        onClick={() => { handleNavigation("/arp/dashboard") }}
                     >
                         Dashboard
                     </Link>
@@ -31,7 +31,7 @@ function TopNav() {
                         className={`btn btn-link ${isActive('/arp/patient_care_report') ? 'active' : ''}`}
                         style={{ marginRight: '10px' }}
                         to="/arp/patient_care_report"
-                    /* onClick={() => { handleNavigation("/arp/patient_care_report") }} */
+                        onClick={() => { handleNavigation("/arp/patient_care_report") }}
                     >
                         Patient Care Report
                     </Link>
@@ -39,7 +39,7 @@ function TopNav() {
                     <Link
                         className={`btn btn-link ${isActive('/arp/location_tracking_record') ? 'active' : ''}`}
                         to="/arp/location_tracking_record"
-                    /* onClick={() => { handleNavigation("/arp/location_tracking_record") }} */
+                        onClick={() => { handleNavigation("/arp/location_tracking_record") }}
                     >
                         Location Tracking Record
                     </Link>

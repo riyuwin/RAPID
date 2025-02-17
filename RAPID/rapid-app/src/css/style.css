@@ -381,8 +381,14 @@ body.sidebar-hidden #main {
 }
 
 .logo img {
-  max-height: 26px;
-  margin-right: 6px;
+  max-height: 40px;
+  max-width: 50px;
+  margin-right: 20px;
+}
+
+.logoContainer {
+  width: 100%;
+  height: 100%;
 }
 
 .logo span {

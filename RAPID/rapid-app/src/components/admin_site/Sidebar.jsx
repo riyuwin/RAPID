@@ -48,6 +48,14 @@ function Sidebar({ isVisible }) {
                                 <i className="bx bxs-map"></i>
                                 <span>Tracking Report</span>
                             </Link>
+
+                            <Link
+                                className={`nav-link ${isActive('/admin/manage_messages') ? '' : 'collapsed'}`}
+                                to="/admin/manage_messages" // Use 'to' instead of 'href'
+                            >
+                                <i className="bx bx-chat"></i>
+                                <span>Messages</span>
+                            </Link>
                         </li>
 
                         <hr />

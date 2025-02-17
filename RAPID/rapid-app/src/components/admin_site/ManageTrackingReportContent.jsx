@@ -313,44 +313,46 @@ function ManageTrackingReportContent() {
                                                             </thead>
                                                             <tbody>
                                                                 {currentRecords.length > 0 ? (
-                                                                    currentRecords.map((record, index) => (
-                                                                        <tr key={record.trackingId}>
-                                                                            <td>{indexOfFirstRecord + index + 1}</td>
-                                                                            <td>{ambulanceNames[record.ambulanceId] || "Loading..."}</td>
-                                                                            <td>{arpNames[record.ARP_ID] || "Loading..."}</td>
-                                                                            <td>
-                                                                                {record.SavedAt
-                                                                                    ? new Date(record.SavedAt).toLocaleString("en-US", {
-                                                                                        month: "long",
-                                                                                        day: "2-digit",
-                                                                                        year: "numeric",
-                                                                                        hour: "2-digit",
-                                                                                        minute: "2-digit",
-                                                                                        hour12: true,
-                                                                                    })
-                                                                                    : "N/A"}
-                                                                            </td>
-                                                                            <td>{record.tracking_status || "N/A"}</td>
-                                                                            <td>
-                                                                                <button className="btn btn-success btn-sm"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#trackingModal"
-                                                                                    onClick={() => fetchTrackingData(record.trackingId, ambulanceNames[record.ambulanceId], arpNames[record.ARP_ID], "View")}>
-                                                                                    <i className="fas fa-eye"></i> View
-                                                                                </button>
-                                                                                <button className="btn btn-primary btn-sm"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#trackingModal"
-                                                                                    onClick={() => fetchTrackingData(record.trackingId, ambulanceNames[record.ambulanceId], arpNames[record.ARP_ID], "Edit")}>
-                                                                                    <i className="fas fa-edit"></i> Edit
-                                                                                </button>
-                                                                                <button className="btn btn-danger btn-sm"
-                                                                                    onClick={() => handleDelete("TrackingInformation", record.trackingId)}>
-                                                                                    <i className="fas fa-trash"></i> Delete
-                                                                                </button>
-                                                                            </td>
-                                                                        </tr>
-                                                                    ))
+                                                                    [...currentRecords] // Create a shallow copy to avoid mutating the original array
+                                                                        .sort((a, b) => new Date(b.SavedAt) - new Date(a.SavedAt)) // Sorting from latest to oldest
+                                                                        .map((record, index) => (
+                                                                            <tr key={record.trackingId}>
+                                                                                <td>{indexOfFirstRecord + index + 1}</td>
+                                                                                <td>{ambulanceNames[record.ambulanceId] || "Loading..."}</td>
+                                                                                <td>{arpNames[record.ARP_ID] || "Loading..."}</td>
+                                                                                <td>
+                                                                                    {record.SavedAt
+                                                                                        ? new Date(record.SavedAt).toLocaleString("en-US", {
+                                                                                            month: "long",
+                                                                                            day: "2-digit",
+                                                                                            year: "numeric",
+                                                                                            hour: "2-digit",
+                                                                                            minute: "2-digit",
+                                                                                            hour12: true,
+                                                                                        })
+                                                                                        : "N/A"}
+                                                                                </td>
+                                                                                <td>{record.tracking_status || "N/A"}</td>
+                                                                                <td>
+                                                                                    <button className="btn btn-success btn-sm"
+                                                                                        data-bs-toggle="modal"
+                                                                                        data-bs-target="#trackingModal"
+                                                                                        onClick={() => fetchTrackingData(record.trackingId, ambulanceNames[record.ambulanceId], arpNames[record.ARP_ID], "View")}>
+                                                                                        <i className="fas fa-eye"></i> View
+                                                                                    </button>
+                                                                                    <button className="btn btn-primary btn-sm"
+                                                                                        data-bs-toggle="modal"
+                                                                                        data-bs-target="#trackingModal"
+                                                                                        onClick={() => fetchTrackingData(record.trackingId, ambulanceNames[record.ambulanceId], arpNames[record.ARP_ID], "Edit")}>
+                                                                                        <i className="fas fa-edit"></i> Edit
+                                                                                    </button>
+                                                                                    <button className="btn btn-danger btn-sm"
+                                                                                        onClick={() => handleDelete("TrackingInformation", record.trackingId)}>
+                                                                                        <i className="fas fa-trash"></i> Delete
+                                                                                    </button>
+                                                                                </td>
+                                                                            </tr>
+                                                                        ))
                                                                 ) : (
                                                                     <tr>
                                                                         <td colSpan="6" className="text-center">
@@ -359,6 +361,7 @@ function ManageTrackingReportContent() {
                                                                     </tr>
                                                                 )}
                                                             </tbody>
+
                                                         </table>
                                                     </div>
 

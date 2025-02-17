@@ -140,6 +140,8 @@ function PatientCareReportContent() {
         DeletePatientCareReport("PatientCareReport", accountId, patientId);
     };
 
+    const [PDFStatus, setPDFStatus] = useState(null);
+
     const handleViewClick = (patientId, patient_status) => {
         ResetForms();
         handleActionButtonClick("View")

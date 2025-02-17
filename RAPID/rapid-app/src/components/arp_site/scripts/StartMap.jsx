@@ -3,7 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 /* import '../../../../css/style.css'; */
 import 'leaflet-routing-machine';
-import 'leaflet-routing-machine/dist/leaflet-routing-machine.css'; // Ensure CSS for routing
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
 export const StartMap = ({ coordinates }) => {
     const [map, setMap] = useState(null);
@@ -37,7 +37,6 @@ export const StartMap = ({ coordinates }) => {
                 zoom: 13,
             });
 
-            // Add OpenStreetMap tile layer
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             }).addTo(initMap);

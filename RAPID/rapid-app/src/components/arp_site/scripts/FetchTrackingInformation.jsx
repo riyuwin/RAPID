@@ -301,47 +301,50 @@ function TrackingTable({ currentUid }) {
                                                         <td colSpan="5" className="text-center">No patient records found.</td>
                                                     </tr>
                                                 ) : (
-                                                    currentRecords.map((tracking, index) => (
-                                                        <tr key={index}>
-                                                            <td>{indexOfFirstRecord + index + 1}</td>
-                                                            <td>
-                                                                {tracking.SavedAt
-                                                                    ? new Date(tracking.SavedAt).toLocaleString("en-US", {
-                                                                        month: "long",
-                                                                        day: "numeric",
-                                                                        year: "numeric",
-                                                                    }).replace(",", ",")
-                                                                    : "N/A"}
-                                                            </td>
-                                                            <td>
-                                                                {tracking.SavedAt
-                                                                    ? new Date(tracking.SavedAt).toLocaleString("en-US", {
-                                                                        hour: "2-digit",
-                                                                        minute: "2-digit",
-                                                                        hour12: true,
-                                                                    }).replace(",", " at")
-                                                                    : "N/A"}
-                                                            </td>
-                                                            <td>{tracking.tracking_status || "Pending"}</td>
-                                                            <td>
-                                                                <button
-                                                                    className="btn btn-primary btn-sm"
-                                                                    onClick={() => fetchTrackingData(tracking.trackingId)}
-                                                                >
-                                                                    <i className="fas fa-edit"></i> Edit
-                                                                </button>
-                                                                <button
-                                                                    className="btn btn-danger btn-sm"
-                                                                    type="button"
-                                                                    onClick={() => handleDelete("TrackingInformation", tracking.trackingId)}
-                                                                >
-                                                                    <i className="fas fa-trash"></i> Delete
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    ))
+                                                    [...currentRecords] // Create a copy to avoid mutating the original state
+                                                        .sort((a, b) => new Date(b.SavedAt) - new Date(a.SavedAt)) // Sort by SavedAt (latest first)
+                                                        .map((tracking, index) => (
+                                                            <tr key={index}>
+                                                                <td>{indexOfFirstRecord + index + 1}</td>
+                                                                <td>
+                                                                    {tracking.SavedAt
+                                                                        ? new Date(tracking.SavedAt).toLocaleString("en-US", {
+                                                                            month: "long",
+                                                                            day: "numeric",
+                                                                            year: "numeric",
+                                                                        }).replace(",", ",")
+                                                                        : "N/A"}
+                                                                </td>
+                                                                <td>
+                                                                    {tracking.SavedAt
+                                                                        ? new Date(tracking.SavedAt).toLocaleString("en-US", {
+                                                                            hour: "2-digit",
+                                                                            minute: "2-digit",
+                                                                            hour12: true,
+                                                                        }).replace(",", " at")
+                                                                        : "N/A"}
+                                                                </td>
+                                                                <td>{tracking.tracking_status || "Pending"}</td>
+                                                                <td>
+                                                                    <button
+                                                                        className="btn btn-primary btn-sm"
+                                                                        onClick={() => fetchTrackingData(tracking.trackingId)}
+                                                                    >
+                                                                        <i className="fas fa-edit"></i> Edit
+                                                                    </button>
+                                                                    <button
+                                                                        className="btn btn-danger btn-sm"
+                                                                        type="button"
+                                                                        onClick={() => handleDelete("TrackingInformation", tracking.trackingId)}
+                                                                    >
+                                                                        <i className="fas fa-trash"></i> Delete
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        ))
                                                 )}
                                             </tbody>
+
                                         </table>
                                     </div>
                                     <br />

@@ -7,8 +7,7 @@ import { firestore } from '../../firebase/firebase';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-import { Dropdown } from "bootstrap";
-
+import { Dropdown } from 'bootstrap';
 
 function NavBar() {
     const [isSidebarVisible, setIsSidebarVisible] = useState(true);
@@ -16,20 +15,6 @@ function NavBar() {
     const [account, setAccount] = useState(null); // Track user account details
     const [loading, setLoading] = useState(true); // Track loading state
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
-        dropdownElementList.forEach(dropdown => {
-            new Dropdown(dropdown);
-        });
-    }, []);
-
-    // Toggle sidebar visibility
-    const toggleSidebar = () => {
-        setIsSidebarVisible(!isSidebarVisible);
-        document.body.classList.toggle('toggle-sidebar');
-        console.log("Sidebar visibility:", !isSidebarVisible);
-    };
 
     useEffect(() => {
         const auth = getAuth();
@@ -59,11 +44,31 @@ function NavBar() {
             } else {
                 setIsUserLoggedIn(false);
                 setAccount(null);
+                setLoading(false);
             }
         });
 
         return () => unsubscribe();
     }, []);
+
+    // Dropdown initialization once the component has mounted
+    useEffect(() => {
+        // Ensure Bootstrap is loaded and dropdown is initialized
+        if (window.bootstrap) {
+            const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
+            dropdownElementList.forEach(dropdown => {
+                new window.bootstrap.Dropdown(dropdown);
+            });
+        } else {
+            console.error("Bootstrap is not loaded!");
+        }
+    }, []);
+
+    // Toggle sidebar visibility
+    const toggleSidebar = () => {
+        setIsSidebarVisible(!isSidebarVisible);
+        document.body.classList.toggle('toggle-sidebar');
+    };
 
     // Handle logout
     const handleLogout = () => {
@@ -78,34 +83,17 @@ function NavBar() {
             <header id="header" className="header fixed-top d-flex align-items-center">
                 <div className="d-flex align-items-center justify-content-center">
                     <Link to="/admin/dashboard" className="logo d-flex align-items-center mx-auto">
-                        <img src="/assets/img/med_logo.png" alt="Logo" />
+                        <img src="/assets/img/logo1.png" className='logoContainer' alt="Logo" />
                         <span className="d-none d-lg-block">RAPID</span>
                     </Link>
                     <i className="bi bi-list toggle-sidebar-btn" onClick={toggleSidebar}></i>
                 </div>
 
-                {/* <div className="search-bar">
-                    <form className="search-form d-flex align-items-center" method="POST" action="#">
-                        <input
-                            type="text"
-                            id="searchInput"
-                            name="query"
-                            placeholder="Search"
-                            title="Enter search keyword"
-                        />
-                        <button type="submit" title="Search">
-                            <i className="bi bi-search"></i>
-                        </button>
-                        <ul id="searchSuggestions"></ul>
-                    </form>
-                </div> */}
-
                 <nav className="header-nav ms-auto">
                     <ul className="d-flex align-items-center">
                         <li className="nav-item dropdown pe-3">
-
                             <Link
-                                className="nav-link nav-profile d-flex align-items-center justify-content-center pe-0 "
+                                className="nav-link nav-profile d-flex align-items-center justify-content-center pe-0"
                                 to="/admin/notification"
                             >
                                 <img
@@ -125,7 +113,7 @@ function NavBar() {
                                 aria-expanded="false"
                             >
                                 <p className="navbarUserName mb-0 me-2">
-                                    {account ? `Hi, ${account.firstName}!` : 'Welcome!'}
+                                    {loading ? 'Loading...' : (account ? `Hi, ${account.firstName}!` : 'Welcome!')}
                                 </p>
                                 <img
                                     src="/assets/img/profile.png"
@@ -140,18 +128,14 @@ function NavBar() {
                                     <h6>{account ? account.firstName : 'Guest'}</h6>
                                     <span>{account ? account.userLevel : 'User'}</span>
                                 </li>
-                                <li>
-                                    <hr className="dropdown-divider" />
-                                </li>
+                                <li><hr className="dropdown-divider" /></li>
                                 <li>
                                     <Link className="dropdown-item d-flex align-items-center" to="/admin/profile">
                                         <i className="bi bi-person"></i>
                                         <span>My Profile</span>
                                     </Link>
                                 </li>
-                                <li>
-                                    <hr className="dropdown-divider" />
-                                </li>
+                                <li><hr className="dropdown-divider" /></li>
                                 {isUserLoggedIn ? (
                                     <li>
                                         <button className="dropdown-item d-flex align-items-center" onClick={handleLogout}>
@@ -168,8 +152,8 @@ function NavBar() {
                                     </li>
                                 )}
                             </ul>
-                        </li>
 
+                        </li>
                     </ul>
                 </nav>
             </header>

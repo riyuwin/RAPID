@@ -131,8 +131,11 @@ function ManagePatientRecordsContent() {
         }
     };
 
+    const [PDFStatus, setPDFStatus] = useState(null);
+
     const handleViewClick = (patientId, patient_status, remarks) => {
         ResetForms();
+        setPDFStatus('Reset')
         // Call the fetch function and log the data
         PatientCareReportFetcher(patientId, (data, err) => {
             if (err) {
@@ -396,46 +399,48 @@ function ManagePatientRecordsContent() {
                                                                 </thead>
                                                                 <tbody>
                                                                     {currentRecords.length > 0 ? (
-                                                                        currentRecords.map((record, index) => (
-                                                                            <tr key={record.id}>
-                                                                                <td>{indexOfFirstRecord + index + 1}</td>
-                                                                                <td>{`${record.basicInformation?.firstName || "N/A"} ${record.basicInformation?.surname || "N/A"}`}</td>
-                                                                                <td>
-                                                                                    {record.savedAt
-                                                                                        ? new Date(record.savedAt.seconds * 1000).toLocaleString("en-US", {
-                                                                                            month: "long",
-                                                                                            day: "2-digit",
-                                                                                            year: "numeric",
-                                                                                            hour: "2-digit",
-                                                                                            minute: "2-digit",
-                                                                                            hour12: true,
-                                                                                        })
-                                                                                        : "N/A"}
-                                                                                </td>
-                                                                                <td>{arpNames[record.ambulancePersonelId] || "Loading..."}</td>
-                                                                                <td>{record.patient_status || "N/A"}</td>
-                                                                                <td>
-                                                                                    <button className="btn btn-success btn-sm"
-                                                                                        data-bs-toggle="modal"
-                                                                                        data-bs-target="#addPatientCareReport"
-                                                                                        onClick={() => handleViewClick(record.patientId, record.patient_status, 'View')}>
-                                                                                        <i className="fas fa-eye"></i> View
-                                                                                    </button>
+                                                                        [...currentRecords] // Create a shallow copy to avoid mutating the original array
+                                                                            .sort((a, b) => (b.savedAt?.seconds || 0) - (a.savedAt?.seconds || 0)) // Sorting latest first
+                                                                            .map((record, index) => (
+                                                                                <tr key={record.id}>
+                                                                                    <td>{indexOfFirstRecord + index + 1}</td>
+                                                                                    <td>{`${record.basicInformation?.firstName || "N/A"} ${record.basicInformation?.surname || "N/A"}`}</td>
+                                                                                    <td>
+                                                                                        {record.savedAt
+                                                                                            ? new Date(record.savedAt.seconds * 1000).toLocaleString("en-US", {
+                                                                                                month: "long",
+                                                                                                day: "2-digit",
+                                                                                                year: "numeric",
+                                                                                                hour: "2-digit",
+                                                                                                minute: "2-digit",
+                                                                                                hour12: true,
+                                                                                            })
+                                                                                            : "N/A"}
+                                                                                    </td>
+                                                                                    <td>{arpNames[record.ambulancePersonelId] || "Loading..."}</td>
+                                                                                    <td>{record.patient_status || "N/A"}</td>
+                                                                                    <td>
+                                                                                        <button className="btn btn-success btn-sm"
+                                                                                            data-bs-toggle="modal"
+                                                                                            data-bs-target="#addPatientCareReport"
+                                                                                            onClick={() => handleViewClick(record.patientId, record.patient_status, 'View')}>
+                                                                                            <i className="fas fa-eye"></i> View
+                                                                                        </button>
 
-                                                                                    <button className="btn btn-primary btn-sm"
-                                                                                        data-bs-toggle="modal"
-                                                                                        data-bs-target="#addPatientCareReport"
-                                                                                        onClick={() => handleEditClick(record.patientId, record.patient_status, 'Edit')}>
-                                                                                        <i className="fas fa-edit"></i> Edit
-                                                                                    </button>
+                                                                                        <button className="btn btn-primary btn-sm"
+                                                                                            data-bs-toggle="modal"
+                                                                                            data-bs-target="#addPatientCareReport"
+                                                                                            onClick={() => handleEditClick(record.patientId, record.patient_status, 'Edit')}>
+                                                                                            <i className="fas fa-edit"></i> Edit
+                                                                                        </button>
 
-                                                                                    <button className="btn btn-danger btn-sm"
-                                                                                        onClick={() => handleDeletePatient(record.patientId)}>
-                                                                                        <i className="fas fa-trash"></i> Delete
-                                                                                    </button>
-                                                                                </td>
-                                                                            </tr>
-                                                                        ))
+                                                                                        <button className="btn btn-danger btn-sm"
+                                                                                            onClick={() => handleDeletePatient(record.patientId)}>
+                                                                                            <i className="fas fa-trash"></i> Delete
+                                                                                        </button>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            ))
                                                                     ) : (
                                                                         <tr>
                                                                             <td colSpan="6" className="text-center">
@@ -444,6 +449,7 @@ function ManagePatientRecordsContent() {
                                                                         </tr>
                                                                     )}
                                                                 </tbody>
+
                                                             </table>
                                                         </div>
 

@@ -115,7 +115,7 @@ function ManageAmbulanceContent() {
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     // Calculate total pages
-    const totalPages = Math.ceil(filteredAccounts.length / itemsPerPage);
+    /* const totalPages = Math.ceil(filteredAccounts.length / itemsPerPage); */
 
     // Handle Edit action
     const handleEdit = (ambulance) => {
@@ -159,6 +159,15 @@ function ManageAmbulanceContent() {
         return new Intl.DateTimeFormat('en-US', options).format(date);
     };
 
+
+    /* const [currentPage, setCurrentPage] = useState(1); */
+    const recordsPerPage = 10;
+
+    const indexOfLastRecord = currentPage * recordsPerPage;
+    const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+    const currentRecords = filteredAccounts.slice(indexOfFirstRecord, indexOfLastRecord);
+
+    const totalPages = Math.ceil(filteredAccounts.length / recordsPerPage);
 
 
     return (
@@ -232,29 +241,31 @@ function ManageAmbulanceContent() {
                                                             </thead>
                                                             <tbody>
                                                                 {currentItems.length > 0 ? (
-                                                                    currentItems.map((ambulance, index) => (
-                                                                        <tr key={ambulance.id}>
-                                                                            <td>{index + 1}</td>
-                                                                            <td>{ambulance.AmbulanceName}</td>
-                                                                            <td>{formatDate(ambulance.DateRegistered)}</td>
-                                                                            <td>
-                                                                                <button
-                                                                                    onClick={() => handleEdit(ambulance)}
-                                                                                    className="btn btn-primary"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#addAmbulanceModal"
-                                                                                >
-                                                                                    <i className="bx bx-edit-alt"></i> Edit
-                                                                                </button>
-                                                                                <button
-                                                                                    onClick={() => handleDelete(ambulance.id)}
-                                                                                    className="btn btn-danger"
-                                                                                >
-                                                                                    <i className="bx bx-trash-alt"></i> Delete
-                                                                                </button>
-                                                                            </td>
-                                                                        </tr>
-                                                                    ))
+                                                                    [...currentItems] // Create a shallow copy to avoid mutating the original array
+                                                                        .sort((a, b) => new Date(b.DateRegistered) - new Date(a.DateRegistered)) // Sorting by latest DateRegistered
+                                                                        .map((ambulance, index) => (
+                                                                            <tr key={ambulance.id}>
+                                                                                <td>{index + 1}</td>
+                                                                                <td>{ambulance.AmbulanceName}</td>
+                                                                                <td>{formatDate(ambulance.DateRegistered)}</td>
+                                                                                <td>
+                                                                                    <button
+                                                                                        onClick={() => handleEdit(ambulance)}
+                                                                                        className="btn btn-primary"
+                                                                                        data-bs-toggle="modal"
+                                                                                        data-bs-target="#addAmbulanceModal"
+                                                                                    >
+                                                                                        <i className="bx bx-edit-alt"></i> Edit
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={() => handleDelete(ambulance.id)}
+                                                                                        className="btn btn-danger"
+                                                                                    >
+                                                                                        <i className="bx bx-trash-alt"></i> Delete
+                                                                                    </button>
+                                                                                </td>
+                                                                            </tr>
+                                                                        ))
                                                                 ) : (
                                                                     <tr>
                                                                         <td colSpan="4" className="no-accounts">
@@ -263,7 +274,30 @@ function ManageAmbulanceContent() {
                                                                     </tr>
                                                                 )}
                                                             </tbody>
+
                                                         </table>
+                                                    </div>
+
+                                                    <br />
+                                                    {/* Pagination Controls */}
+                                                    <div className="d-flex justify-content-between align-items-center mt-3">
+                                                        <button
+                                                            className="btn btn-secondary"
+                                                            disabled={currentPage === 1}
+                                                            onClick={() => setCurrentPage(currentPage - 1)}
+                                                        >
+                                                            Previous
+                                                        </button>
+
+                                                        <span>Page {currentPage} of {totalPages}</span>
+
+                                                        <button
+                                                            className="btn btn-secondary"
+                                                            disabled={currentPage === totalPages}
+                                                            onClick={() => setCurrentPage(currentPage + 1)}
+                                                        >
+                                                            Next
+                                                        </button>
                                                     </div>
 
                                                 </div>

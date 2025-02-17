@@ -18,6 +18,7 @@ import Notification from "./pages/admin_site/Notification";
 import ARP_Profile from "./pages/arp_site/ARP_Profile";
 import Test from "./components/arp_site/Test";
 import ARP_Notification from "./pages/arp_site/Notification";
+import Messages from "./pages/admin_site/ManageMessages";
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
         <Route path="admin/manage_ambulance" element={<ManageAmbulance />} />
         <Route path="admin/profile" element={<Profile />} />
         <Route path="admin/notification" element={<Notification />} />
+        <Route path="admin/manage_messages" element={<Messages />} />
 
         {/* Authentication Pages */}
         <Route path="" element={<Login />} />

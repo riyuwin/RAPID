@@ -1,28 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
+import Sidebar from './Sidebar';
 import { collection, query, where, getDocs } from "@firebase/firestore";
 import { firestore } from '../../firebase/firebase';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-import { Dropdown } from "bootstrap";
-
-
-
+import { Dropdown } from 'bootstrap';
 
 function NavBar() {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const [account, setAccount] = useState(null); // Track user account details
     const [loading, setLoading] = useState(true); // Track loading state
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
-        dropdownElementList.forEach(dropdown => {
-            new Dropdown(dropdown);
-        });
-    }, []);
 
     useEffect(() => {
         const auth = getAuth();
@@ -32,7 +23,6 @@ function NavBar() {
             if (user) {
                 setIsUserLoggedIn(true);
                 const currentUid = user.uid;
-
                 try {
                     // Fetch account data from Firestore
                     const accountsRef = collection(firestore, "AccountInformation");
@@ -53,14 +43,24 @@ function NavBar() {
             } else {
                 setIsUserLoggedIn(false);
                 setAccount(null);
+                setLoading(false);
             }
         });
 
-        // Initialize dropdowns after the component is mounted
-        /* const dropdownElements = document.querySelectorAll('.dropdown-toggle');
-        dropdownElements.forEach((dropdown) => new Dropdown(dropdown)); */
-
         return () => unsubscribe();
+    }, []);
+
+    // Dropdown initialization once the component has mounted
+    useEffect(() => {
+        // Ensure Bootstrap is loaded and dropdown is initialized
+        if (window.bootstrap) {
+            const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
+            dropdownElementList.forEach(dropdown => {
+                new window.bootstrap.Dropdown(dropdown);
+            });
+        } else {
+            console.error("Bootstrap is not loaded!");
+        }
     }, []);
 
     // Handle logout
@@ -76,7 +76,7 @@ function NavBar() {
             <header id="header" className="header fixed-top d-flex align-items-center">
                 <div className="d-flex align-items-center justify-content-center">
                     <Link to="/arp/dashboard" className="logo d-flex align-items-center mx-auto">
-                        <img src="../../assets/img/med_logo.png" alt="Logo" />
+                        <img src="/assets/img/logo1.png" className='logoContainer' alt="Logo" />
                         <span className="d-none d-lg-block">RAPID</span>
                     </Link>
                 </div>
@@ -84,9 +84,8 @@ function NavBar() {
                 <nav className="header-nav ms-auto">
                     <ul className="d-flex align-items-center">
                         <li className="nav-item dropdown pe-3">
-
                             <Link
-                                className="nav-link nav-profile d-flex align-items-center justify-content-center pe-0 "
+                                className="nav-link nav-profile d-flex align-items-center justify-content-center pe-0"
                                 to="/arp/notification"
                             >
                                 <img
@@ -99,58 +98,55 @@ function NavBar() {
                             </Link>
                         </li>
 
-                        <li className="nav-item dropdown pe-3">
-                            <button
-                                className="nav-link nav-profile d-flex align-items-center justify-content-center pe-0"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                <p className="navbarUserName mb-0 me-2">
-                                    {account ? `Hi, ${account.firstName}!` : 'Welcome!'}
-                                </p>
-                                <img
-                                    src="/assets/img/profile.png"
-                                    alt="Profile"
-                                    id="navbarProfilePicture"
-                                    className="rounded-circle"
-                                />
-                            </button>
+                        {account?.firstName ? (
+                            <li className="nav-item dropdown pe-3">
+                                <button
+                                    className="nav-link nav-profile d-flex align-items-center justify-content-center pe-0"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    <p className="navbarUserName mb-0 me-2">
+                                        {loading ? 'Loading...' : `Hi, ${account.firstName}!`}
+                                    </p>
+                                    <img
+                                        src="/assets/img/profile.png"
+                                        alt="Profile"
+                                        id="navbarProfilePicture"
+                                        className="rounded-circle"
+                                    />
+                                </button>
 
-
-                            <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-                                <li className="dropdown-header">
-                                    <h6>{account ? account.firstName : 'Guest'}</h6>
-                                    <span>{account ? account.userLevel : 'User'}</span>
-                                </li>
-                                <li>
-                                    <hr className="dropdown-divider" />
-                                </li>
-                                <li>
-                                    <Link className="dropdown-item d-flex align-items-center" to="/arp/profile">
-                                        <i className="bi bi-person"></i>
-                                        <span>My Profile</span>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <hr className="dropdown-divider" />
-                                </li>
-                                {isUserLoggedIn ? (
-                                    <li>
-                                        <button className="dropdown-item d-flex align-items-center" onClick={handleLogout}>
-                                            <i className="bi bi-box-arrow-right"></i>
-                                            <span>Logout</span>
-                                        </button>
+                                <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                                    <li className="dropdown-header">
+                                        <h6>{account.firstName}</h6>
+                                        <span>{account.userLevel || 'User'}</span>
                                     </li>
-                                ) : (
+                                    <li><hr className="dropdown-divider" /></li>
                                     <li>
-                                        <Link className="dropdown-item d-flex align-items-center" to="/login">
-                                            <i className="bi bi-box-arrow-right"></i>
-                                            <span>Login</span>
+                                        <Link className="dropdown-item d-flex align-items-center" to="/arp/profile">
+                                            <i className="bi bi-person"></i>
+                                            <span>My Profile</span>
                                         </Link>
                                     </li>
-                                )}
-                            </ul>
-                        </li>
+                                    <li><hr className="dropdown-divider" /></li>
+                                    {isUserLoggedIn ? (
+                                        <li>
+                                            <button className="dropdown-item d-flex align-items-center" onClick={handleLogout}>
+                                                <i className="bi bi-box-arrow-right"></i>
+                                                <span>Logout</span>
+                                            </button>
+                                        </li>
+                                    ) : (
+                                        <li>
+                                            <Link className="dropdown-item d-flex align-items-center" to="/login">
+                                                <i className="bi bi-box-arrow-right"></i>
+                                                <span>Login</span>
+                                            </Link>
+                                        </li>
+                                    )}
+                                </ul>
+                            </li>
+                        ) : null}
 
 
                     </ul>
