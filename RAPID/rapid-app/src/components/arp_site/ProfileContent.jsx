@@ -58,8 +58,9 @@ function ProfileContent() {
 
     return (
         <>
-            <main className="main_arp">
+            <main id="main" className="main">
                 <div className="content">
+                    <br />
                     <h1>My Profile</h1>
                     <nav>
                         <ol className="breadcrumb">

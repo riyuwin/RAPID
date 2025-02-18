@@ -218,7 +218,7 @@ function ARP_DashboardContent() {
 
     return (
         <>
-            <div className="main_arp">
+            <div id="main" className="main">
                 <div className="container-arp">
                     <h1>asgsag</h1>
                 </div>
@@ -226,6 +226,7 @@ function ARP_DashboardContent() {
                 <div className="content"  >
                     <div className="row">
                         <div className="col-12">
+                            <br />
                             <h1>Dashboard</h1>
                             <nav  >
                                 <ol className="breadcrumb">
@@ -236,7 +237,7 @@ function ARP_DashboardContent() {
                                 </ol>
                             </nav>
                         </div>
-                        <TopNav />
+                        {/* <TopNav /> */}
 
 
                     </div>

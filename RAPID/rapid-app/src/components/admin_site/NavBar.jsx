@@ -115,15 +115,15 @@ function NavBar() {
                                 <p className="navbarUserName mb-0 me-2">
                                     {loading ? 'Loading...' : (account ? `Hi, ${account.firstName}!` : 'Welcome!')}
                                 </p>
-                                <img
+                                {/* <img
                                     src="/assets/img/profile.png"
                                     alt="Profile"
                                     id="navbarProfilePicture"
                                     className="rounded-circle"
-                                />
+                                /> */}
                             </button>
 
-                            <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                            {/* <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                                 <li className="dropdown-header">
                                     <h6>{account ? account.firstName : 'Guest'}</h6>
                                     <span>{account ? account.userLevel : 'User'}</span>
@@ -151,7 +151,7 @@ function NavBar() {
                                         </Link>
                                     </li>
                                 )}
-                            </ul>
+                            </ul> */}
 
                         </li>
                     </ul>

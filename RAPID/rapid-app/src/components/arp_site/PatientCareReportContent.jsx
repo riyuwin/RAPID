@@ -500,7 +500,7 @@ function PatientCareReportContent() {
 
     return (
         <>
-            <div className="main_arp">
+            <div id="main" className="main">
                 <div className="container-arp">
                     <h1>asgsag</h1>
                 </div>
@@ -508,6 +508,7 @@ function PatientCareReportContent() {
                 <div className="content"  >
                     <div className="row">
                         <div className="col-12">
+                            <br />
                             <h1>Patient Care Report</h1>
                             <nav  >
                                 <ol className="breadcrumb">
@@ -520,7 +521,7 @@ function PatientCareReportContent() {
                         </div>
 
 
-                        <TopNav />
+                        {/* <TopNav /> */}
 
                     </div>
                 </div>

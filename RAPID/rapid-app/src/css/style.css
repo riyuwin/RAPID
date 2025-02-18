@@ -729,6 +729,11 @@ body.sidebar-hidden #main {
   color: #899bbd;
 }
 
+.sidebar-nav .nav-link.collapsedLogout i {
+  color: #899bbd;
+  background: #fff;
+}
+
 .sidebar-nav .nav-link:hover {
   color: #08533F;
   background: #f6f9ff;

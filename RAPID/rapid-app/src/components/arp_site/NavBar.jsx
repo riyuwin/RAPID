@@ -14,6 +14,7 @@ function NavBar() {
     const [account, setAccount] = useState(null); // Track user account details
     const [loading, setLoading] = useState(true); // Track loading state
     const navigate = useNavigate();
+    const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
     useEffect(() => {
         const auth = getAuth();
@@ -71,6 +72,13 @@ function NavBar() {
             .catch((error) => console.error("Logout error: ", error));
     };
 
+
+    // Toggle sidebar visibility
+    const toggleSidebar = () => {
+        setIsSidebarVisible(!isSidebarVisible);
+        document.body.classList.toggle('toggle-sidebar');
+    };
+
     return (
         <>
             <header id="header" className="header fixed-top d-flex align-items-center">
@@ -79,6 +87,7 @@ function NavBar() {
                         <img src="/assets/img/logo1.png" className='logoContainer' alt="Logo" />
                         <span className="d-none d-lg-block">RAPID</span>
                     </Link>
+                    <i className="bi bi-list toggle-sidebar-btn" onClick={toggleSidebar}></i>
                 </div>
 
                 <nav className="header-nav ms-auto">
@@ -102,21 +111,19 @@ function NavBar() {
                             <li className="nav-item dropdown pe-3">
                                 <button
                                     className="nav-link nav-profile d-flex align-items-center justify-content-center pe-0"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
                                 >
                                     <p className="navbarUserName mb-0 me-2">
                                         {loading ? 'Loading...' : `Hi, ${account.firstName}!`}
                                     </p>
-                                    <img
+                                    {/* <img
                                         src="/assets/img/profile.png"
                                         alt="Profile"
                                         id="navbarProfilePicture"
                                         className="rounded-circle"
-                                    />
+                                    /> */}
                                 </button>
 
-                                <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                                {/* <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                                     <li className="dropdown-header">
                                         <h6>{account.firstName}</h6>
                                         <span>{account.userLevel || 'User'}</span>
@@ -144,7 +151,7 @@ function NavBar() {
                                             </Link>
                                         </li>
                                     )}
-                                </ul>
+                                </ul> */}
                             </li>
                         ) : null}
 
@@ -152,6 +159,7 @@ function NavBar() {
                     </ul>
                 </nav>
             </header>
+            <Sidebar isVisible={isSidebarVisible} />
         </>
     );
 }

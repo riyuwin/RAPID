@@ -148,14 +148,12 @@ function LocationTrackingContent() {
 
     return (
         <>
-            <div className="main_arp">
-                <div className="container-arp">
-                    <h1>asgsag</h1>
-                </div>
+            <div id="main" className="main">
 
                 <div className="content"  >
                     <div className="row">
                         <div className="col-12">
+                            <br />
                             <h1>Location Tracking Report</h1>
                             <nav  >
                                 <ol className="breadcrumb">
@@ -166,7 +164,7 @@ function LocationTrackingContent() {
                                 </ol>
                             </nav>
                         </div>
-                        <TopNav />
+                        {/* <TopNav /> */}
 
 
                     </div>

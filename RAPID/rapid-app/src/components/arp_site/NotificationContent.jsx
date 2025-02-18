@@ -104,8 +104,9 @@ function NotificationContent() {
 
     return (
         <>
-            <main id="main_arp" className="main_arp">
+            <main id="main" className="div">
                 <div className="content">
+                    <br />
                     <h1>Notification</h1>
                     <nav>
                         <ol className="breadcrumb">
