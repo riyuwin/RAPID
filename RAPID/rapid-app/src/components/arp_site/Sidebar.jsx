@@ -77,7 +77,7 @@ function Sidebar({ isVisible }) {
                                 className={`nav-link ${isActive('/arp/dashboard') ? '' : 'collapsed'}`}
                                 id="dashboard"
                                 to="/arp/dashboard"
-                                onClick={() => handleNavigation('/arp/dashboard')}
+                            /* onClick={() => handleNavigation('/arp/dashboard')} */
                             >
                                 <i className="bi bi-grid"></i>
                                 <span>Dashboard</span>
@@ -92,7 +92,7 @@ function Sidebar({ isVisible }) {
                             <Link
                                 className={`nav-link ${isActive('/arp/patient_care_report') ? '' : 'collapsed'}`}
                                 to="/arp/patient_care_report"
-                                onClick={() => handleNavigation('/arp/location_tracking_record')}
+                            /* onClick={() => handleNavigation('/arp/location_tracking_record')} */
                             >
                                 <i className="bx bxs-ambulance"></i>
                                 <span>Patient Care Report</span>
@@ -101,9 +101,9 @@ function Sidebar({ isVisible }) {
 
                         <li className="nav-item">
                             <Link
-                                className={`nav-link ${isActive('arp/location_tracking_record') ? '' : 'collapsed'}`}
+                                className={`nav-link ${isActive('/arp/location_tracking_record') ? '' : 'collapsed'}`}
                                 to="/arp/location_tracking_record"
-                                onClick={() => handleNavigation('/arp/location_tracking_record')}
+                            /*  onClick={() => handleNavigation('/arp/location_tracking_record')} */
                             >
                                 <i className="bx bxs-map"></i>
                                 <span>Location Tracking Record</span>
@@ -115,7 +115,7 @@ function Sidebar({ isVisible }) {
                         <Link
                             className={`nav-link ${isActive('/arp/profile') ? '' : 'collapsed'}`}
                             to="/arp/profile"
-                            onClick={() => { handleNavigation("/arp/profile") }}
+                        /* onClick={() => { handleNavigation("/arp/profile") }} */
                         >
                             <i className="bi bi-person"></i>
                             <span>My Profile</span>
