@@ -108,7 +108,7 @@ export const ResetForms = async () => {
     if (getCheckboxValueIfChecked('obsGynHaemorrhageLess')) obs_gnyae['obsGynHaemorrhageLess'] = true;
     if (getCheckboxValueIfChecked('obsGynLabour')) obs_gnyae['obsGynLabour'] = true;
     if (getCheckboxValueIfChecked('obsGynPPH')) obs_gnyae['obsGynPPH'] = true;
-    if (getCheckboxValueIfChecked('obsGynPreDelivery')) obs_gnyae['obsGynPreDelivery'] = true;
+    /* if (getCheckboxValueIfChecked('obsGynPreDelivery')) obs_gnyae['obsGynPreDelivery'] = true; */
 
     // Handle "Other Obstetrics/Gynaecology" logic
     const otherObsGynChecked = getCheckboxValueIfChecked('otherObsGyn');
@@ -151,7 +151,7 @@ export const ResetForms = async () => {
     }
 
 
-    const mechanismInjury = {};
+    /* const mechanismInjury = {};
     if (getCheckboxValueIfChecked('mechanismInjuryAssault')) mechanismInjury['mechanismInjuryAssault'] = true;
     if (getCheckboxValueIfChecked('mechanismInjuryAnimalAttack')) mechanismInjury['mechanismInjuryAnimalAttack'] = true;
     if (getCheckboxValueIfChecked('mechanismInjuryChemical')) mechanismInjury['mechanismInjuryChemical'] = true;
@@ -174,7 +174,7 @@ export const ResetForms = async () => {
     const mechanismInjuryOtherInputValue = getValueInputIfNotEmpty('mechanismInjuryOtherInput');
     if (mechanismInjuryOtherChecked && mechanismInjuryOtherInputValue) {
         mechanismInjury['mechanismInjuryOtherInput'] = mechanismInjuryOtherInputValue;
-    }
+    } */
 
     const medical = {};
     if (getCheckboxValueIfChecked('medicalBackPain')) medical['medicalBackPain'] = true;
@@ -560,8 +560,13 @@ export const ResetForms = async () => {
 
     // Classification object
     const classification = {};
-    if (getValueInputIfNotEmpty('classificationPrivate')) {
-        classification['classificationPrivate'] = getValueInputIfNotEmpty('classificationPrivate');
+    if (getCheckboxValueIfChecked('classificationPrivate')) collisionType['classificationPrivate'] = getCheckboxValueIfChecked('classificationPrivate');
+    if (getCheckboxValueIfChecked('classificationPublic')) collisionType['classificationPublic'] = getCheckboxValueIfChecked('classificationPublic');
+    if (getCheckboxValueIfChecked('classificationGovernment')) collisionType['classificationGovernment'] = getCheckboxValueIfChecked('classificationGovernment');
+    if (getCheckboxValueIfChecked('classificationDiplomat')) collisionType['classificationDiplomat'] = getCheckboxValueIfChecked('classificationDiplomat');
+
+    /* if (getCheckboxValueIfChecked('classificationPrivate')) {
+        classification['classificationPrivate'] = getCheckboxValueIfChecked('classificationPrivate');
     }
     if (getValueInputIfNotEmpty('classificationPublic')) {
         classification['classificationPublic'] = getValueInputIfNotEmpty('classificationPublic');
@@ -571,7 +576,7 @@ export const ResetForms = async () => {
     }
     if (getValueInputIfNotEmpty('classificationDiplomat')) {
         classification['classificationDiplomat'] = getValueInputIfNotEmpty('classificationDiplomat');
-    }
+    } */
 
     // Type of vehicle object
     const typeVehicle = {};

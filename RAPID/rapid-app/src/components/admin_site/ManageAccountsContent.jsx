@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { firestore } from '../../firebase/firebase';
 import { collection, getDocs } from "@firebase/firestore";
-/* import '../../../css/style.css';
-import '../../../css/table.css'; */
 import { Link } from 'react-router-dom';
+import PopUpNotification from './PopUpNotification';
 
 function ManageAccountsContent() {
     const [accounts, setAccounts] = useState([]);
     const [filteredAccounts, setFilteredAccounts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+    const itemsPerPage = 10;
 
-    // Fetching data from Firestore
     useEffect(() => {
-        // Fetching data from Firestore (This part stays the same)
         const fetchData = async () => {
             try {
                 const accountsCollection = collection(firestore, "AccountInformation");
@@ -33,51 +30,30 @@ function ManageAccountsContent() {
         fetchData();
     }, []);
 
-    // Handle search and filter
     const handleSearch = (event) => {
         const searchTerm = event.target.value.toLowerCase();
-
-        // Filter accounts by account name (combining first, middle, and last name)
         const filtered = accounts.filter(account =>
             `${account.firstName} ${account.middleName} ${account.lastName}`
                 .toLowerCase()
                 .includes(searchTerm)
         );
         setFilteredAccounts(filtered);
+        setCurrentPage(1); // Reset pagination
     };
 
-    // Handle status filter
     const handleStatusFilter = (event) => {
         const selectedStatus = event.target.value;
-
-        // Filter accounts based on the selected status
         const filtered = accounts.filter(account =>
             selectedStatus ? account.status === selectedStatus : true
         );
         setFilteredAccounts(filtered);
+        setCurrentPage(1); // Reset pagination
     };
 
-    // Get current accounts for the current page
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredAccounts.slice(indexOfFirstItem, indexOfLastItem);
-
-    // Handle page change
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    // Calculate total pages
-    /* const totalPages = Math.ceil(filteredAccounts.length / itemsPerPage); */
-
-
-    // Pagination states
-    /* const [currentPage, setCurrentPage] = useState(1); */
-    const recordsPerPage = 10;
-
-    // Compute indexes for pagination
-    const indexOfLastRecord = currentPage * recordsPerPage;
-    const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-    const currentRecords = currentItems.slice(indexOfFirstRecord, indexOfLastRecord);
-    const totalPages = Math.ceil(currentItems.length / recordsPerPage);
+    const currentRecords = filteredAccounts.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredAccounts.length / itemsPerPage);
 
     return (
         <>
@@ -96,13 +72,10 @@ function ManageAccountsContent() {
 
                 <hr />
 
-
                 <main className="py-6 ">
                     <div className="container-fluid">
                         <section className="section dashboard">
                             <div className="row">
-
-
                                 <div className="col-lg-12">
                                     <div className="row">
                                         <div className="col-xxl-12 col-md-12">
@@ -154,7 +127,7 @@ function ManageAccountsContent() {
                                                                     {currentRecords.length > 0 ? (
                                                                         currentRecords.map((account, index) => (
                                                                             <tr key={account.id}>
-                                                                                <td>{indexOfFirstRecord + index + 1}</td>
+                                                                                <td>{indexOfFirstItem + index + 1}</td>
                                                                                 <td>{account.firstName} {account.middleName} {account.lastName}</td>
 
                                                                                 <td>
@@ -193,7 +166,7 @@ function ManageAccountsContent() {
                                                             <button
                                                                 className="btn btn-secondary"
                                                                 disabled={currentPage === 1}
-                                                                onClick={() => setCurrentPage(currentPage - 1)}
+                                                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                                                             >
                                                                 Previous
                                                             </button>
@@ -202,8 +175,8 @@ function ManageAccountsContent() {
 
                                                             <button
                                                                 className="btn btn-secondary"
-                                                                disabled={currentPage === totalPages}
-                                                                onClick={() => setCurrentPage(currentPage + 1)}
+                                                                disabled={currentPage === totalPages || totalPages === 0}
+                                                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                                                             >
                                                                 Next
                                                             </button>
@@ -221,6 +194,8 @@ function ManageAccountsContent() {
                     </div>
                 </main>
             </main>
+
+            <PopUpNotification />
         </>
     );
 }

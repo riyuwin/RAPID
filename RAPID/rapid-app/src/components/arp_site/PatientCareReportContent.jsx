@@ -492,18 +492,24 @@ function PatientCareReportContent() {
     const [currentPage, setCurrentPage] = useState(1);
     const recordsPerPage = 10;
 
+    // Sort the dataset safely (handling null values)
+    const sortedRecords = [...filteredAccounts].sort((a, b) => {
+        const dateA = a.savedAt?.toDate ? a.savedAt.toDate() : new Date(0); // Default to old date if null
+        const dateB = b.savedAt?.toDate ? b.savedAt.toDate() : new Date(0);
+
+        return dateB - dateA; // Sort latest to oldest
+    });
+
     // Compute indexes for pagination
     const indexOfLastRecord = currentPage * recordsPerPage;
     const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-    const currentRecords = filteredAccounts.slice(indexOfFirstRecord, indexOfLastRecord);
-    const totalPages = Math.ceil(filteredAccounts.length / recordsPerPage);
+    const currentRecords = sortedRecords.slice(indexOfFirstRecord, indexOfLastRecord);
+    const totalPages = Math.ceil(sortedRecords.length / recordsPerPage);
+
 
     return (
         <>
             <div id="main" className="main">
-                <div className="container-arp">
-                    <h1>asgsag</h1>
-                </div>
 
                 <div className="content"  >
                     <div className="row">
@@ -677,7 +683,7 @@ function PatientCareReportContent() {
                         {/* Modal for selecting ambulance */}
 
                         {/* Modal for selecting ambulance */}
-                        <div className="modal fade" id="addPatientCareReport" tabindex="-1" aria-labelledby="addPatientCareReport" aria-hidden="true">
+                        <div className="modal fade" id="addPatientCareReport" tabindex="-1" aria-labelledby="addPatientCareReport" aria-hidden="true" >
                             <div className="modal-dialog modal-xl"> {/* Apply modal-lg for a larger width */}
                                 <div className="modal-content">
                                     <div className="modal-header">
@@ -794,55 +800,55 @@ function PatientCareReportContent() {
                                                         <div style={{ display: patientCareReportStatus === "Call Received" ? "block" : "none" }}>
                                                             <div className="row">
                                                                 <div className="col-md-3">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput">Call Received: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput">Call Received:  </label>
                                                                     <input
                                                                         id='callReceived'
-                                                                        type="text"
+                                                                        type="time"
                                                                         className="form-control"
                                                                     />
                                                                 </div>
 
                                                                 <div className="col-md-3">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">To Scene: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">To Scene:  </label>
                                                                     <input
                                                                         id='toScene'
-                                                                        type="text"
+                                                                        type="time"
                                                                         className="form-control"
                                                                     />
                                                                 </div>
 
                                                                 <div className="col-md-3">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">At Scene: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">At Scene:  </label>
                                                                     <input
                                                                         id='atSceneInput'
-                                                                        type="text"
+                                                                        type="time"
                                                                         className="form-control"
                                                                     />
                                                                 </div>
 
                                                                 <div className="col-md-3">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">To Hospital: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">To Hospital:  </label>
                                                                     <input
                                                                         id='toHospitalInput'
-                                                                        type="text"
+                                                                        type="time"
                                                                         className="form-control"
                                                                     />
                                                                 </div>
 
                                                                 <div className="col-md-3">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">At Hospital: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">At Hospital:  </label>
                                                                     <input
                                                                         id='atHospitalInput'
-                                                                        type="text"
+                                                                        type="time"
                                                                         className="form-control"
                                                                     />
                                                                 </div>
 
                                                                 <div className="col-md-3">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">Base: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">Base:  </label>
                                                                     <input
                                                                         id='baseInput'
-                                                                        type="text"
+                                                                        type="time"
                                                                         className="form-control"
                                                                     />
                                                                 </div>
@@ -857,7 +863,7 @@ function PatientCareReportContent() {
                                                         <div style={{ display: patientCareReportStatus === "Basic Information" ? "block" : "none" }}>
                                                             <div className="row">
                                                                 <div className="col-md-3" >
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">First Name: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">First Name:  </label>
                                                                     <input
                                                                         id='nameInput'
                                                                         type="text"
@@ -876,7 +882,7 @@ function PatientCareReportContent() {
 
 
                                                                 <div className="col-md-3">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">Surname: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">Surname:  </label>
                                                                     <input
                                                                         id='surnameInput'
                                                                         type="text"
@@ -899,7 +905,7 @@ function PatientCareReportContent() {
 
 
                                                                 <div className="col-md-3">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">Age: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">Age:  </label>
                                                                     <input
                                                                         id='ageInput'
                                                                         type="number"
@@ -908,7 +914,7 @@ function PatientCareReportContent() {
                                                                 </div>
 
                                                                 <div className="col-md-3">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="genderSelect">Gender: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="genderSelect">Gender:  </label>
                                                                     <select
                                                                         id="genderSelect"
                                                                         className="form-select"
@@ -930,7 +936,7 @@ function PatientCareReportContent() {
 
                                                                 <div className="col-md-3" >
                                                                     <label style={{ color: "black", marginBottom: "10px", marginTop: '10px' }} htmlFor="nationalitySelect">
-                                                                        Nationality: <span className='required-form'>*</span>
+                                                                        Nationality:
                                                                     </label>
                                                                     <select
                                                                         id="nationalitySelect"
@@ -956,7 +962,7 @@ function PatientCareReportContent() {
                                                                 </div>
 
                                                                 <div className="col-md-12">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="addressInput123">Complete Residential Address: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="addressInput123">Complete Residential Address:</label>
                                                                     <input
                                                                         id='addressInput'
                                                                         type="text"
@@ -975,21 +981,21 @@ function PatientCareReportContent() {
                                                         <div style={{ display: patientCareReportStatus === "Clinical Impression" ? "block" : "none" }}>
                                                             <div className="row">
                                                                 <div className="col-md-3">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="triageTaggingR">Triage Tagging: <span className='required-form'>*</span></label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="triageTaggingR">Triage Tagging:  </label>
 
                                                                     <br />
                                                                     <hr />
                                                                     <div className="form-check">
-                                                                        <input type="checkbox" id="triageTaggingR" name="triageTagging" className="form-check-input" />
+                                                                        <input type="radio" id="triageTaggingR" name="triageTagging" className="form-check-input" />
                                                                         <label htmlFor="triageTaggingR" className="form-check-label">R</label><br />
 
-                                                                        <input type="checkbox" id="triageTaggingY" name="triageTagging" className="form-check-input" />
+                                                                        <input type="radio" id="triageTaggingY" name="triageTagging" className="form-check-input" />
                                                                         <label htmlFor="triageTaggingY" className="form-check-label">Y</label><br />
 
-                                                                        <input type="checkbox" id="triageTaggingG" name="triageTagging" className="form-check-input" />
+                                                                        <input type="radio" id="triageTaggingG" name="triageTagging" className="form-check-input" />
                                                                         <label htmlFor="triageTaggingG" className="form-check-label">G</label><br />
 
-                                                                        <input type="checkbox" id="triageTaggingB" name="triageTagging" className="form-check-input" />
+                                                                        <input type="radio" id="triageTaggingB" name="triageTagging" className="form-check-input" />
                                                                         <label htmlFor="triageTaggingB" className="form-check-label">B</label><br />
 
                                                                     </div>
@@ -1001,13 +1007,13 @@ function PatientCareReportContent() {
                                                                     <br />
                                                                     <hr />
                                                                     <div className="form-check">
-                                                                        <input type="checkbox" id="natureCallEmergent" name="natureOfCall" className="form-check-input" />
+                                                                        <input type="radio" id="natureCallEmergent" name="natureOfCall" className="form-check-input" />
                                                                         <label htmlFor="natureCallEmergent" className="form-check-label">Emergent</label><br />
 
-                                                                        <input type="checkbox" id="natureCallUrgent" name="natureOfCall" className="form-check-input" />
+                                                                        <input type="radio" id="natureCallUrgent" name="natureOfCall" className="form-check-input" />
                                                                         <label htmlFor="natureCallUrgent" className="form-check-label">Urgent</label><br />
 
-                                                                        <input type="checkbox" id="natureCallNonEmergent" name="natureOfCall" className="form-check-input" />
+                                                                        <input type="radio" id="natureCallNonEmergent" name="natureOfCall" className="form-check-input" />
                                                                         <label htmlFor="natureCallNonEmergent" className="form-check-label">Non-Emergent</label><br />
 
                                                                     </div>
@@ -1055,10 +1061,10 @@ function PatientCareReportContent() {
                                                                     <br /> <hr />
                                                                     <div className="form-check">
                                                                         <input type="checkbox" id="obsGynHaemorrhage" name="obsGyn" className="form-check-input" />
-                                                                        <label htmlFor="obsGynHaemorrhage" className="form-check-label">Haemorrhage &lt; 24 Wks</label><br />
+                                                                        <label htmlFor="obsGynHaemorrhage" className="form-check-label">Haemorrhage &lt; 24 Wks of Pregnancy</label><br />
 
                                                                         <input type="checkbox" id="obsGynHaemorrhageLess" name="obsGyn" className="form-check-input" />
-                                                                        <label htmlFor="obsGynHaemorrhageLess" className="form-check-label">Haemorrhage &gt; 24 Wks</label><br />
+                                                                        <label htmlFor="obsGynHaemorrhageLess" className="form-check-label">Haemorrhage &gt; 24 Wks of Pregnancy</label><br />
 
                                                                         <input type="checkbox" id="obsGynLabour" name="obsGyn" className="form-check-input" />
                                                                         <label htmlFor="obsGynLabour" className="form-check-label">Labour</label><br />
@@ -1066,8 +1072,8 @@ function PatientCareReportContent() {
                                                                         <input type="checkbox" id="obsGynPPH" name="obsGyn" className="form-check-input" />
                                                                         <label htmlFor="obsGynPPH" className="form-check-label">PPH</label><br />
 
-                                                                        <input type="checkbox" id="obsGynPreDelivery" name="obsGyn" className="form-check-input" />
-                                                                        <label htmlFor="obsGynPreDelivery" className="form-check-label">Pre-Hospital Delivery</label><br />
+                                                                        {/* <input type="checkbox" id="obsGynPreDelivery" name="obsGyn" className="form-check-input" />
+                                                                        <label htmlFor="obsGynPreDelivery" className="form-check-label">Pre-Hospital Delivery</label><br /> */}
 
                                                                         <input type="checkbox" id="otherObsGyn" name="obsGyn" className="form-check-input" />
                                                                         <label htmlFor="otherObsGyn" className="form-check-label">Other Obs/Gynae</label><br />
@@ -1162,7 +1168,7 @@ function PatientCareReportContent() {
                                                                 </div>
 
 
-                                                                <div className="col-md-3">
+                                                                {/* <div className="col-md-3">
                                                                     <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="mechanismInjuryAssault">Mechanism of Injury: <span className='required-form'>*</span></label>
 
                                                                     <br /> <hr />
@@ -1229,10 +1235,10 @@ function PatientCareReportContent() {
                                                                         />
                                                                     </div>
 
-                                                                </div>
+                                                                </div> */}
 
                                                                 <div className="col-md-3">
-                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="medicalBackPain">Medical:</label>
+                                                                    <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="medicalBackPain">Hypothermia:</label>
 
                                                                     <br /> <hr />
                                                                     <div className="form-check">
@@ -1382,22 +1388,22 @@ function PatientCareReportContent() {
 
                                                                     <br /> <hr />
                                                                     <div className="form-check">
-                                                                        <input type="checkbox" id="motorNone" name="motor" className="form-check-input" />
+                                                                        <input type="radio" id="motorNone" name="motor" className="form-check-input" />
                                                                         <label htmlFor="motorNone" className="form-check-label">1. NONE</label><br />
 
-                                                                        <input type="checkbox" id="motorExtension" name="motor" className="form-check-input" />
+                                                                        <input type="radio" id="motorExtension" name="motor" className="form-check-input" />
                                                                         <label htmlFor="motorExtension" className="form-check-label">2. EXTENSION</label><br />
 
-                                                                        <input type="checkbox" id="motorFlexion" name="motor" className="form-check-input" />
+                                                                        <input type="radio" id="motorFlexion" name="motor" className="form-check-input" />
                                                                         <label htmlFor="motorFlexion" className="form-check-label">3. FLEXION</label><br />
 
-                                                                        <input type="checkbox" id="motorWithdraw" name="motor" className="form-check-input" />
+                                                                        <input type="radio" id="motorWithdraw" name="motor" className="form-check-input" />
                                                                         <label htmlFor="motorWithdraw" className="form-check-label">4. WITHDRAW</label><br />
 
-                                                                        <input type="checkbox" id="motorLocalize" name="motor" className="form-check-input" />
+                                                                        <input type="radio" id="motorLocalize" name="motor" className="form-check-input" />
                                                                         <label htmlFor="motorLocalize" className="form-check-label">5. LOCALIZE</label><br />
 
-                                                                        <input type="checkbox" id="motorObey" name="motor" className="form-check-input" />
+                                                                        <input type="radio" id="motorObey" name="motor" className="form-check-input" />
                                                                         <label htmlFor="motorObey" className="form-check-label">6. OBEY</label><br />
                                                                     </div>
                                                                 </div>
@@ -1408,19 +1414,19 @@ function PatientCareReportContent() {
 
                                                                     <br /> <hr />
                                                                     <div className="form-check">
-                                                                        <input type="checkbox" id="verbalNone" name="verbal" className="form-check-input" />
+                                                                        <input type="radio" id="verbalNone" name="verbal" className="form-check-input" />
                                                                         <label htmlFor="verbalNone" className="form-check-label">1. NONE</label><br />
 
-                                                                        <input type="checkbox" id="verbalIncomprehensible" name="verbal" className="form-check-input" />
+                                                                        <input type="radio" id="verbalIncomprehensible" name="verbal" className="form-check-input" />
                                                                         <label htmlFor="verbalIncomprehensible" className="form-check-label">2. INCOMPREHENSIBLE</label><br />
 
-                                                                        <input type="checkbox" id="verbalInappropriate" name="verbal" className="form-check-input" />
+                                                                        <input type="radio" id="verbalInappropriate" name="verbal" className="form-check-input" />
                                                                         <label htmlFor="verbalInappropriate" className="form-check-label">3. INAPPROPRIATE</label><br />
 
-                                                                        <input type="checkbox" id="verbalConfused" name="verbal" className="form-check-input" />
+                                                                        <input type="radio" id="verbalConfused" name="verbal" className="form-check-input" />
                                                                         <label htmlFor="verbalConfused" className="form-check-label">4. CONFUSED</label><br />
 
-                                                                        <input type="checkbox" id="verbalOriented" name="verbal" className="form-check-input" />
+                                                                        <input type="radio" id="verbalOriented" name="verbal" className="form-check-input" />
                                                                         <label htmlFor="verbalOriented" className="form-check-label">5. ORIENTED</label><br />
                                                                     </div>
                                                                 </div>
@@ -1430,16 +1436,16 @@ function PatientCareReportContent() {
 
                                                                     <br /> <hr />
                                                                     <div className="form-check">
-                                                                        <input type="checkbox" id="eyeNone" name="eye" className="form-check-input" />
+                                                                        <input type="radio" id="eyeNone" name="eye" className="form-check-input" />
                                                                         <label htmlFor="eyeNone" className="form-check-label">1. NONE</label><br />
 
-                                                                        <input type="checkbox" id="eyeToPain" name="eye" className="form-check-input" />
+                                                                        <input type="radio" id="eyeToPain" name="eye" className="form-check-input" />
                                                                         <label htmlFor="eyeToPain" className="form-check-label">2. TO PAIN</label><br />
 
-                                                                        <input type="checkbox" id="eyeToVoice" name="eye" className="form-check-input" />
+                                                                        <input type="radio" id="eyeToVoice" name="eye" className="form-check-input" />
                                                                         <label htmlFor="eyeToVoice" className="form-check-label">3. TO VOICE</label><br />
 
-                                                                        <input type="checkbox" id="eyeSpontaneous" name="eye" className="form-check-input" />
+                                                                        <input type="radio" id="eyeSpontaneous" name="eye" className="form-check-input" />
                                                                         <label htmlFor="eyeSpontaneous" className="form-check-label">4. SPONTANEOUS</label><br />
                                                                     </div>
                                                                 </div>
@@ -1467,16 +1473,16 @@ function PatientCareReportContent() {
 
                                                                     <br /> <hr />
                                                                     <div className="form-check">
-                                                                        <input type="checkbox" id="pulsePositive" name="pulse" className="form-check-input" />
+                                                                        <input type="radio" id="pulsePositive" name="pulse" className="form-check-input" />
                                                                         <label htmlFor="pulsePositive" className="form-check-label">Positive</label><br />
 
-                                                                        <input type="checkbox" id="pulseRapid" name="pulse" className="form-check-input" />
+                                                                        <input type="radio" id="pulseRapid" name="pulse" className="form-check-input" />
                                                                         <label htmlFor="pulseRapid" className="form-check-label">Rapid</label><br />
 
-                                                                        <input type="checkbox" id="pulseSlow" name="pulse" className="form-check-input" />
+                                                                        <input type="radio" id="pulseSlow" name="pulse" className="form-check-input" />
                                                                         <label htmlFor="pulseSlow" className="form-check-label">Slow</label><br />
 
-                                                                        <input type="checkbox" id="pulseNegative" name="pulse" className="form-check-input" />
+                                                                        <input type="radio" id="pulseNegative" name="pulse" className="form-check-input" />
                                                                         <label htmlFor="pulseNegative" className="form-check-label">Negative</label><br />
                                                                     </div>
                                                                 </div>
@@ -1486,13 +1492,13 @@ function PatientCareReportContent() {
 
                                                                     <br /> <hr />
                                                                     <div className="form-check">
-                                                                        <input type="checkbox" id="airwayClear" name="airway" className="form-check-input" />
+                                                                        <input type="radio" id="airwayClear" name="airway" className="form-check-input" />
                                                                         <label htmlFor="airwayClear" className="form-check-label">Clear</label><br />
 
-                                                                        <input type="checkbox" id="airwayPartial" name="airway" className="form-check-input" />
+                                                                        <input type="radio" id="airwayPartial" name="airway" className="form-check-input" />
                                                                         <label htmlFor="airwayPartial" className="form-check-label">Partially Obstructed</label><br />
 
-                                                                        <input type="checkbox" id="airwayObstructed" name="airway" className="form-check-input" />
+                                                                        <input type="radio" id="airwayObstructed" name="airway" className="form-check-input" />
                                                                         <label htmlFor="airwayObstructed" className="form-check-label">Obstructed</label><br />
                                                                     </div>
                                                                 </div>
@@ -1502,22 +1508,22 @@ function PatientCareReportContent() {
 
                                                                     <br /> <hr />
                                                                     <div className="form-check">
-                                                                        <input type="checkbox" id="breathingNormal" name="breathing" className="form-check-input" />
+                                                                        <input type="radio" id="breathingNormal" name="breathing" className="form-check-input" />
                                                                         <label htmlFor="breathingNormal" className="form-check-label">Normal</label><br />
 
-                                                                        <input type="checkbox" id="breathingRapid" name="breathing" className="form-check-input" />
+                                                                        <input type="radio" id="breathingRapid" name="breathing" className="form-check-input" />
                                                                         <label htmlFor="breathingRapid" className="form-check-label">Rapid</label><br />
 
-                                                                        <input type="checkbox" id="breathingSlow" name="breathing" className="form-check-input" />
+                                                                        <input type="radio" id="breathingSlow" name="breathing" className="form-check-input" />
                                                                         <label htmlFor="breathingSlow" className="form-check-label">Slow</label><br />
 
-                                                                        <input type="checkbox" id="breathingShallow" name="breathing" className="form-check-input" />
+                                                                        <input type="radio" id="breathingShallow" name="breathing" className="form-check-input" />
                                                                         <label htmlFor="breathingShallow" className="form-check-label">Shallow</label><br />
 
-                                                                        <input type="checkbox" id="breathingHyperventilate" name="breathing" className="form-check-input" />
+                                                                        <input type="radio" id="breathingHyperventilate" name="breathing" className="form-check-input" />
                                                                         <label htmlFor="breathingHyperventilate" className="form-check-label">Hyperventilate</label><br />
 
-                                                                        <input type="checkbox" id="breathingNone" name="breathing" className="form-check-input" />
+                                                                        <input type="radio" id="breathingNone" name="breathing" className="form-check-input" />
                                                                         <label htmlFor="breathingNone" className="form-check-label">None</label><br />
                                                                     </div>
                                                                 </div>
@@ -1527,10 +1533,10 @@ function PatientCareReportContent() {
 
                                                                     <br /> <hr />
                                                                     <div className="form-check">
-                                                                        <input type="checkbox" id="gagReflexPresent" name="gagReflex" className="form-check-input" />
+                                                                        <input type="radio" id="gagReflexPresent" name="gagReflex" className="form-check-input" />
                                                                         <label htmlFor="gagReflexPresent" className="form-check-label">Present</label><br />
 
-                                                                        <input type="checkbox" id="gagReflexAbsent" name="gagReflex" className="form-check-input" />
+                                                                        <input type="radio" id="gagReflexAbsent" name="gagReflex" className="form-check-input" />
                                                                         <label htmlFor="gagReflexAbsent" className="form-check-label">Absent</label><br />
                                                                     </div>
                                                                 </div>
@@ -1658,19 +1664,19 @@ function PatientCareReportContent() {
                                                                                 <tr>
                                                                                     <th scope="row" >
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row1LOCA" name="row1LOCA" className="form-check-input" />
+                                                                                            <input type="radio" id="row1LOCA" name="row1LOCA" className="form-check-input" />
                                                                                             <label htmlFor="row1LOCA" className="form-check-label">A</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row1LOCV" name="row1LOCV" className="form-check-input" />
+                                                                                            <input type="radio" id="row1LOCV" name="row1LOCV" className="form-check-input" />
                                                                                             <label htmlFor="row1LOCV" className="form-check-label">V</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row1LOCP" name="row1LOCP" className="form-check-input" />
+                                                                                            <input type="radio" id="row1LOCP" name="row1LOCP" className="form-check-input" />
                                                                                             <label htmlFor="row1LOCP" className="form-check-label">P</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row1LOCU" name="row1LOCU" className="form-check-input" />
+                                                                                            <input type="radio" id="row1LOCU" name="row1LOCU" className="form-check-input" />
                                                                                             <label htmlFor="row1LOCU" className="form-check-label">U</label>
                                                                                         </div>
                                                                                     </th>
@@ -1709,19 +1715,19 @@ function PatientCareReportContent() {
                                                                                 <tr>
                                                                                     <th scope="row" >
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row2LOCA" name="row2LOCA" className="form-check-input" />
+                                                                                            <input type="radio" id="row2LOCA" name="row2LOCA" className="form-check-input" />
                                                                                             <label htmlFor="row2LOCA" className="form-check-label">A</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row2LOCV" name="row2LOCV" className="form-check-input" />
+                                                                                            <input type="radio" id="row2LOCV" name="row2LOCV" className="form-check-input" />
                                                                                             <label htmlFor="row2LOCV" className="form-check-label">V</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row2LOCP" name="row2LOCP" className="form-check-input" />
+                                                                                            <input type="radio" id="row2LOCP" name="row2LOCP" className="form-check-input" />
                                                                                             <label htmlFor="row2LOCP" className="form-check-label">P</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row2LOCU" name="row2LOCU" className="form-check-input" />
+                                                                                            <input type="radio" id="row2LOCU" name="row2LOCU" className="form-check-input" />
                                                                                             <label htmlFor="row2LOCU" className="form-check-label">U</label>
                                                                                         </div>
                                                                                     </th>
@@ -1760,19 +1766,19 @@ function PatientCareReportContent() {
                                                                                 <tr>
                                                                                     <th scope="row" >
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row3LOCA" name="row3LOCA" className="form-check-input" />
+                                                                                            <input type="radio" id="row3LOCA" name="row3LOCA" className="form-check-input" />
                                                                                             <label htmlFor="row3LOCA" className="form-check-label">A</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row3LOCV" name="row3LOCV" className="form-check-input" />
+                                                                                            <input type="radio" id="row3LOCV" name="row3LOCV" className="form-check-input" />
                                                                                             <label htmlFor="row3LOCV" className="form-check-label">V</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row3LOCP" name="row3LOCP" className="form-check-input" />
+                                                                                            <input type="radio" id="row3LOCP" name="row3LOCP" className="form-check-input" />
                                                                                             <label htmlFor="row3LOCP" className="form-check-label">P</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row3LOCU" name="row3LOCU" className="form-check-input" />
+                                                                                            <input type="radio" id="row3LOCU" name="row3LOCU" className="form-check-input" />
                                                                                             <label htmlFor="row3LOCU" className="form-check-label">U</label>
                                                                                         </div>
                                                                                     </th>
@@ -1811,19 +1817,19 @@ function PatientCareReportContent() {
                                                                                 <tr>
                                                                                     <th scope="row" >
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row4LOCA" name="row4LOCA" className="form-check-input" />
+                                                                                            <input type="radio" id="row4LOCA" name="row4LOCA" className="form-check-input" />
                                                                                             <label htmlFor="row4LOCA" className="form-check-label">A</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row4LOCV" name="row4LOCV" className="form-check-input" />
+                                                                                            <input type="radio" id="row4LOCV" name="row4LOCV" className="form-check-input" />
                                                                                             <label htmlFor="row4LOCV" className="form-check-label">V</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row4LOCP" name="row4LOCP" className="form-check-input" />
+                                                                                            <input type="radio" id="row4LOCP" name="row4LOCP" className="form-check-input" />
                                                                                             <label htmlFor="row4LOCP" className="form-check-label">P</label>
                                                                                         </div>
                                                                                         <div className="form-check form-check-inline">
-                                                                                            <input type="checkbox" id="row4LOCU" name="row4LOCU" className="form-check-input" />
+                                                                                            <input type="radio" id="row4LOCU" name="row4LOCU" className="form-check-input" />
                                                                                             <label htmlFor="row4LOCU" className="form-check-label">U</label>
                                                                                         </div>
                                                                                     </th>
@@ -1890,12 +1896,12 @@ function PatientCareReportContent() {
                                                                                     </th>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="Pearrl-L" name="Pearrl-L" className="form-check-input " />
+                                                                                            <input type="radio" id="Pearrl-L" name="Pearrl-L" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="Pearrl-R" name="Pearrl-R" className="form-check-input " />
+                                                                                            <input type="radio" id="Pearrl-R" name="Pearrl-R" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -1903,12 +1909,12 @@ function PatientCareReportContent() {
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="Clear-L" name="Clear-L" className="form-check-input " />
+                                                                                            <input type="radio" id="Clear-L" name="Clear-L" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="Clear-R" name="Clear-R" className="form-check-input " />
+                                                                                            <input type="radio" id="Clear-R" name="Clear-R" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -1917,13 +1923,13 @@ function PatientCareReportContent() {
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="limbYes" className="form-check-label">Yes</label>
-                                                                                            <input type="checkbox" id="limbYes" name="limbYes" className="form-check-input" />
+                                                                                            <input type="radio" id="limbYes" name="limbYes" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="limbNo" className="form-check-label">No</label>
-                                                                                            <input type="checkbox" id="limbNo" name="limbNo" className="form-check-input" />
+                                                                                            <input type="radio" id="limbNo" name="limbNo" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
 
@@ -1940,12 +1946,12 @@ function PatientCareReportContent() {
                                                                                     </th>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="Pinpoint-L" name="Pinpoint-L" className="form-check-input " />
+                                                                                            <input type="radio" id="Pinpoint-L" name="Pinpoint-L" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="Pinpoint-R" name="Pinpoint-R" className="form-check-input " />
+                                                                                            <input type="radio" id="Pinpoint-R" name="Pinpoint-R" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -1953,12 +1959,12 @@ function PatientCareReportContent() {
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="AbsentL" name="AbsentL" className="form-check-input " />
+                                                                                            <input type="radio" id="AbsentL" name="AbsentL" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="AbsentR" name="AbsentR" className="form-check-input " />
+                                                                                            <input type="radio" id="AbsentR" name="AbsentR" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -1967,13 +1973,13 @@ function PatientCareReportContent() {
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="armsYes" className="form-check-label">Yes</label>
-                                                                                            <input type="checkbox" id="armsYes" name="armsYes" className="form-check-input" />
+                                                                                            <input type="radio" id="armsYes" name="armsYes" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="armsNo" className="form-check-label">No</label>
-                                                                                            <input type="checkbox" id="armsNo" name="armsNo" className="form-check-input" />
+                                                                                            <input type="radio" id="armsNo" name="armsNo" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
 
@@ -1990,12 +1996,12 @@ function PatientCareReportContent() {
                                                                                     </th>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="dLatedL" name="dLatedL" className="form-check-input " />
+                                                                                            <input type="radio" id="dLatedL" name="dLatedL" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="dLatedR" name="dLatedR" className="form-check-input " />
+                                                                                            <input type="radio" id="dLatedR" name="dLatedR" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -2003,12 +2009,12 @@ function PatientCareReportContent() {
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="decreaseL" name="decreaseL" className="form-check-input " />
+                                                                                            <input type="radio" id="decreaseL" name="decreaseL" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="decreaseR" name="decreaseR" className="form-check-input " />
+                                                                                            <input type="radio" id="decreaseR" name="decreaseR" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -2017,13 +2023,13 @@ function PatientCareReportContent() {
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="armsYes" className="form-check-label">Yes</label>
-                                                                                            <input type="checkbox" id="arms2Yes" name="arms2Yes" className="form-check-input" />
+                                                                                            <input type="radio" id="arms2Yes" name="arms2Yes" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="armsNo" className="form-check-label">No</label>
-                                                                                            <input type="checkbox" id="arms2No" name="arms2No" className="form-check-input" />
+                                                                                            <input type="radio" id="arms2No" name="arms2No" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
 
@@ -2040,12 +2046,12 @@ function PatientCareReportContent() {
                                                                                     </th>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="sluggishL" name="sluggishL" className="form-check-input " />
+                                                                                            <input type="radio" id="sluggishL" name="sluggishL" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="sluggishR" name="sluggishR" className="form-check-input " />
+                                                                                            <input type="radio" id="sluggishR" name="sluggishR" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -2053,12 +2059,12 @@ function PatientCareReportContent() {
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="cracklesL" name="cracklesL" className="form-check-input " />
+                                                                                            <input type="radio" id="cracklesL" name="cracklesL" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="cracklesR" name="cracklesR" className="form-check-input " />
+                                                                                            <input type="radio" id="cracklesR" name="cracklesR" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -2067,13 +2073,13 @@ function PatientCareReportContent() {
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="legs1Yes" className="form-check-label">Yes</label>
-                                                                                            <input type="checkbox" id="legs1Yes" name="legs1Yes" className="form-check-input" />
+                                                                                            <input type="radio" id="legs1Yes" name="legs1Yes" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="legs1No" className="form-check-label">No</label>
-                                                                                            <input type="checkbox" id="legs1No" name="legs1No" className="form-check-input" />
+                                                                                            <input type="radio" id="legs1No" name="legs1No" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
 
@@ -2090,12 +2096,12 @@ function PatientCareReportContent() {
                                                                                     </th>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="fixedL" name="fixedL" className="form-check-input " />
+                                                                                            <input type="radio" id="fixedL" name="fixedL" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="fixedR" name="fixedR" className="form-check-input " />
+                                                                                            <input type="radio" id="fixedR" name="fixedR" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -2103,12 +2109,12 @@ function PatientCareReportContent() {
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="ronchiL" name="ronchiL" className="form-check-input " />
+                                                                                            <input type="radio" id="ronchiL" name="ronchiL" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="ronchiR" name="ronchiR" className="form-check-input " />
+                                                                                            <input type="radio" id="ronchiR" name="ronchiR" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -2117,13 +2123,13 @@ function PatientCareReportContent() {
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="legs2Yes" className="form-check-label">Yes</label>
-                                                                                            <input type="checkbox" id="legs2Yes" name="legs2Yes" className="form-check-input" />
+                                                                                            <input type="radio" id="legs2Yes" name="legs2Yes" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="legs1No" className="form-check-label">No</label>
-                                                                                            <input type="checkbox" id="legs2No" name="legs2No" className="form-check-input" />
+                                                                                            <input type="radio" id="legs2No" name="legs2No" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
 
@@ -2140,12 +2146,12 @@ function PatientCareReportContent() {
                                                                                     </th>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="cataractL" name="cataractL" className="form-check-input " />
+                                                                                            <input type="radio" id="cataractL" name="cataractL" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="cataractR" name="cataractR" className="form-check-input " />
+                                                                                            <input type="radio" id="cataractR" name="cataractR" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -2153,12 +2159,12 @@ function PatientCareReportContent() {
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="wheezeL" name="wheezeL" className="form-check-input " />
+                                                                                            <input type="radio" id="wheezeL" name="wheezeL" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline ">
-                                                                                            <input type="checkbox" id="wheezeR" name="wheezeR" className="form-check-input " />
+                                                                                            <input type="radio" id="wheezeR" name="wheezeR" className="form-check-input " />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
@@ -2167,13 +2173,13 @@ function PatientCareReportContent() {
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="legs2Yes" className="form-check-label">Yes</label>
-                                                                                            <input type="checkbox" id="legs3Yes" name="legs3Yes" className="form-check-input" />
+                                                                                            <input type="radio" id="legs3Yes" name="legs3Yes" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div className="form-check form-check-inline">
                                                                                             <label htmlFor="legs1No" className="form-check-label">No</label>
-                                                                                            <input type="checkbox" id="legs3No" name="legs3No" className="form-check-input" />
+                                                                                            <input type="radio" id="legs3No" name="legs3No" className="form-check-input" />
                                                                                         </div>
                                                                                     </td>
 
@@ -4059,7 +4065,7 @@ function PatientCareReportContent() {
                                                                     <br /> <hr />
                                                                     <div className="form-check">
                                                                         <input
-                                                                            type="checkbox"
+                                                                            type="radio"
                                                                             id="humanError"
                                                                             name="incidentMainCause"
                                                                             className="form-check-input"
@@ -4067,7 +4073,7 @@ function PatientCareReportContent() {
                                                                         <label htmlFor="humanError" className="form-check-label">Human Error</label><br />
 
                                                                         <input
-                                                                            type="checkbox"
+                                                                            type="radio"
                                                                             id="vehicleDefect"
                                                                             name="incidentMainCause"
                                                                             className="form-check-input"
@@ -4075,7 +4081,7 @@ function PatientCareReportContent() {
                                                                         <label htmlFor="vehicleDefect" className="form-check-label">Vehicle Defect</label><br />
 
                                                                         <input
-                                                                            type="checkbox"
+                                                                            type="radio"
                                                                             id="roadDefect"
                                                                             name="incidentMainCause"
                                                                             className="form-check-input"
@@ -4561,16 +4567,16 @@ function PatientCareReportContent() {
                                                                     <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="seatbeltHelmet">Seatbelt/Helmet:</label>
                                                                     <br /> <hr />
                                                                     <div className="form-check">
-                                                                        <input type="checkbox" id="seatbeltHelmetWorn" name="seatbeltHelmet" className="form-check-input" />
+                                                                        <input type="radio" id="seatbeltHelmetWorn" name="seatbeltHelmet" className="form-check-input" />
                                                                         <label htmlFor="seatbeltHelmetWorn" className="form-check-label">Seatbelt/Helmet Worn</label><br />
 
-                                                                        <input type="checkbox" id="seatbeltHelmetNotWorn" name="seatbeltHelmet" className="form-check-input" />
+                                                                        <input type="radio" id="seatbeltHelmetNotWorn" name="seatbeltHelmet" className="form-check-input" />
                                                                         <label htmlFor="seatbeltHelmetNotWorn" className="form-check-label">Not Worn</label><br />
 
-                                                                        <input type="checkbox" id="seatbeltHelmetNotWornCorrectly" name="seatbeltHelmet" className="form-check-input" />
+                                                                        <input type="radio" id="seatbeltHelmetNotWornCorrectly" name="seatbeltHelmet" className="form-check-input" />
                                                                         <label htmlFor="seatbeltHelmetNotWornCorrectly" className="form-check-label">Not Worn Correctly</label><br />
 
-                                                                        <input type="checkbox" id="seatbeltHelmetNoSeatbelt" name="seatbeltHelmet" className="form-check-input" />
+                                                                        <input type="radio" id="seatbeltHelmetNoSeatbelt" name="seatbeltHelmet" className="form-check-input" />
                                                                         <label htmlFor="seatbeltHelmetNoSeatbelt" className="form-check-label">No Seatbelt / Helmet</label><br />
                                                                     </div>
                                                                 </div>
@@ -4594,7 +4600,7 @@ function PatientCareReportContent() {
                                                     className="btn btn-primary"
                                                     id="saveChangesBtn"
                                                 >
-                                                    Save changes
+                                                    Submit
                                                 </button>
                                             )}
                                         </div>
@@ -4607,6 +4613,7 @@ function PatientCareReportContent() {
                     </div >
                 </section >
             </div >
+
         </>
     );
 }

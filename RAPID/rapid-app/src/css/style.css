@@ -1469,3 +1469,38 @@ td {
   font-weight: 200;
   color: rgba(0, 0, 0, 0.55);
 }
+
+.stem_logo {
+  width: 55px;
+  height: 55px;
+}
+
+.triage-box {
+  padding: 10px;
+  border-radius: 5px;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Color Coding */
+.triage-blue {
+  background-color: rgb(0, 0, 0);
+  color: white;
+}
+
+.triage-green {
+  background-color: rgb(60, 133, 60);
+  color: white;
+}
+
+.triage-red {
+  background-color: rgb(227, 52, 52);
+  color: white;
+}
+
+.triage-yellow {
+  background-color: rgb(242, 242, 53);
+  color: black;
+}

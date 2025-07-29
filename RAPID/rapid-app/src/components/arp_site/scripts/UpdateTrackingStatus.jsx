@@ -1,15 +1,14 @@
 import React from 'react';
 import { firestore } from '../../../firebase/firebase';
-import { doc, updateDoc, addDoc, collection, serverTimestamp } from "firebase/firestore"; // Import updateDoc and arrayUnion
+import { doc, updateDoc, addDoc, collection, serverTimestamp } from "firebase/firestore";
 import Swal from 'sweetalert2';
 
 export const UpdateTrackingStatus = async (trackingId, tracking_status, accountId) => {
     try {
-
         // Reference to the specific tracking document using trackingId
         const docRef = doc(firestore, "TrackingInformation", trackingId);
 
-        // Update the document by adding the new coordinate to the coordinates array
+        // Update the document
         await updateDoc(docRef, {
             tracking_status: tracking_status,
         });
@@ -28,12 +27,17 @@ export const UpdateTrackingStatus = async (trackingId, tracking_status, accountI
             NotificationId: notif_docRef.id,
         });
 
-        // Success feedback to the user
+        // Success feedback to the user and reload the page after confirmation
         Swal.fire({
             icon: 'success',
             title: 'Tracking status updated successfully!',
             text: `The tracking status in this record has been updated to ${tracking_status}.`,
+        }).then(() => {
+            localStorage.setItem("trackingStatus", "Stop Tracking");
+            window.location.reload(); // Force reload after setting localStorage
         });
+
+
 
     } catch (error) {
         console.error("Error saving tracking information:", error);

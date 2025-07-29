@@ -4,6 +4,7 @@ import { DisplayMap } from '../arp_site/scripts/DisplayMap';
 import PatientReportChart from './PatientReportChart';
 import FetchAllPatientRecords from './scripts/FetchAllPatientRecords';
 import FetchTotalRecord from './scripts/FetchTotalRecord';
+import PopUpNotification from './PopUpNotification';
 
 function DashboardContent() {
     const [allPatientRecords, setAllPatientRecords] = useState([]);
@@ -222,6 +223,8 @@ function DashboardContent() {
                 </main>
 
             </main>
+
+            <PopUpNotification />
         </>
     );
 }

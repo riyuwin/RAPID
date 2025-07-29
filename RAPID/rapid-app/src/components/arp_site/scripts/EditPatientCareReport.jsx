@@ -143,7 +143,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         }
 
         const mechanismInjury = {};
-        if (getCheckboxValueIfChecked('mechanismInjuryAssault')) mechanismInjury['mechanismInjuryAssault'] = true;
+        /* if (getCheckboxValueIfChecked('mechanismInjuryAssault')) mechanismInjury['mechanismInjuryAssault'] = true;
         if (getCheckboxValueIfChecked('mechanismInjuryAnimalAttack')) mechanismInjury['mechanismInjuryAnimalAttack'] = true;
         if (getCheckboxValueIfChecked('mechanismInjuryChemical')) mechanismInjury['mechanismInjuryChemical'] = true;
         if (getCheckboxValueIfChecked('mechanismInjuryDrowning')) mechanismInjury['mechanismInjuryDrowning'] = true;
@@ -165,7 +165,7 @@ export const handleEditPatientCareReport = async (patientId, accountId) => {
         const mechanismInjuryOtherInputValue = getValueInputIfNotEmpty('mechanismInjuryOtherInput');
         if (mechanismInjuryOtherInputValue) {
             mechanismInjury['mechanismInjuryOtherInput'] = mechanismInjuryOtherInputValue;
-        }
+        } */
 
         const medical = {};
         if (getCheckboxValueIfChecked('medicalBackPain')) medical['medicalBackPain'] = true;

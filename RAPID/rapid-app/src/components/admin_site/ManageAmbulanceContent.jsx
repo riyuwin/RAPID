@@ -5,6 +5,7 @@ import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc, onSnapshot } fr
 import '../../../css/table.css'; */
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import PopUpNotification from './PopUpNotification';
 
 function ManageAmbulanceContent() {
     const [accounts, setAccounts] = useState([]);
@@ -350,6 +351,8 @@ function ManageAmbulanceContent() {
                     </div>
                 </div>
             </div>
+
+            <PopUpNotification />
         </>
     );
 }

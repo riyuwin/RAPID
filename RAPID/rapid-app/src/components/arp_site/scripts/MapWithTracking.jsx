@@ -36,39 +36,68 @@ function MapWithTracking({ page }) {
 
     }, []);
 
+    useEffect(() => {
+        /* const storedName = localStorage.setItem("trackingStatus", "Stop Tracking"); */
+        if (ambulanceId) {
+            const storedName = localStorage.getItem("trackingStatus");
+            console.log("Checking storage:", storedName);
+            if (storedName === "Continue Tracking") {
+                setTracking(true);
+                handleLocationAndTracking();
+
+            } else if (storedName === "Stop Tracking") {
+                setTracking(false);
+                stopTracking()
+            }
+        }
+
+    }, [ambulanceId]);
+
+
     const TrackingInitializer = async (user_accountId) => {
         const text_activeTrackingLabel = document.getElementById('activeTrackingLabel');
-        const detailsTrackingData = await fetchData(user_accountId);
 
-        if (detailsTrackingData?.activeTrackingData) {
-            if (detailsTrackingData.activeTrackingData[0]?.SavedAt) {
+        const fetchAndUpdateTrackingData = async () => {
+            const detailsTrackingData = await fetchData(user_accountId);
 
-                const savedAt = detailsTrackingData.activeTrackingData[0].SavedAt;
-                const date = new Date(savedAt);
+            if (detailsTrackingData?.activeTrackingData) {
+                if (detailsTrackingData.activeTrackingData[0]?.SavedAt) {
 
-                // Format the date to "Month Day, Year"
-                const formattedDate = date.toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "2-digit",
-                    year: "numeric",
-                });
+                    // Get the latest coordinate based on timestamp
+                    const latestCoordinate = detailsTrackingData.activeTrackingData[0].coordinates && detailsTrackingData.activeTrackingData[0].coordinates.length > 0
+                        ? detailsTrackingData.activeTrackingData[0].coordinates.reduce((latest, coord) =>
+                            new Date(coord.timestamp) > new Date(latest.timestamp) ? coord : latest
+                        )
+                        : null;
 
-                // Format the time to "hh:mm AM/PM"
-                const formattedTime = date.toLocaleTimeString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                });
+                    console.log("Test", latestCoordinate);
 
-                // Update the label with both date and time
-                text_activeTrackingLabel.textContent = `${formattedDate} at ${formattedTime}`;
+                    // Update the label with the latest timestamp
+                    text_activeTrackingLabel.textContent = latestCoordinate?.timestamp
+                        ? new Date(latestCoordinate.timestamp).toLocaleString("en-US", {
+                            month: "long",
+                            day: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                        })
+                        : "N/A";
+                } else {
+                    text_activeTrackingLabel.textContent = "No active tracking";
+                }
             } else {
                 text_activeTrackingLabel.textContent = "No active tracking";
             }
-        } else {
-            text_activeTrackingLabel.textContent = "No active tracking";
-        }
+        };
+
+        // Call initially to load data
+        await fetchAndUpdateTrackingData();
+
+        // Set an interval to refresh data every 5 seconds (adjust as needed)
+        setInterval(fetchAndUpdateTrackingData, 5000);
     };
+
 
 
     useEffect(() => {
@@ -150,7 +179,9 @@ function MapWithTracking({ page }) {
         }, [tracking, startPoint]);
     }
 
-    const startTracking = (user_accountId, start_cooridnates) => {
+    const startTracking = (user_accountId, start_coordinates) => {
+        const text_activeTrackingLabel = document.getElementById('activeTrackingLabel');
+
         const processTrackingData = async () => {
             try {
                 // Fetch tracking data
@@ -160,32 +191,45 @@ function MapWithTracking({ page }) {
                     // Start tracking if data is available
                     startTrackingInterval(detailsTrackingData);
 
-                    const text_activeTrackingLabel = document.getElementById('activeTrackingLabel');
+                    // Function to update the tracking label
+                    const updateTrackingLabel = () => {
+                        // Get the latest coordinate based on timestamp
+                        const latestCoordinate = detailsTrackingData.activeTrackingData[0].coordinates?.length > 0
+                            ? detailsTrackingData.activeTrackingData[0].coordinates.reduce((latest, coord) =>
+                                new Date(coord.timestamp) > new Date(latest.timestamp) ? coord : latest
+                            )
+                            : null;
 
-                    // Ensure `SavedAt` exists in the tracking data
-                    const savedAt = detailsTrackingData.activeTrackingData[0]?.SavedAt;
-                    if (savedAt) {
-                        const date = new Date(savedAt);
+                        // Ensure `SavedAt` exists in the tracking data
+                        const savedAt = detailsTrackingData.activeTrackingData[0]?.SavedAt;
+                        if (savedAt) {
+                            text_activeTrackingLabel.textContent = latestCoordinate?.timestamp
+                                ? new Date(latestCoordinate.timestamp).toLocaleString("en-US", {
+                                    month: "long",
+                                    day: "2-digit",
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    second: "2-digit", // Added seconds for real-time effect
+                                    hour12: true,
+                                })
+                                : "N/A";
+                        } else {
+                            text_activeTrackingLabel.textContent = "Active Tracking: No data available";
+                        }
+                    };
 
-                        // Format the date to "Month Day, Year"
-                        const formattedDate = date.toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "2-digit",
-                            year: "numeric",
-                        });
+                    // Initial update
+                    updateTrackingLabel();
 
-                        // Format the time to "hh:mm AM/PM"
-                        const formattedTime = date.toLocaleTimeString("en-US", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true,
-                        });
-
-                        // Update the label with both date and time
-                        text_activeTrackingLabel.textContent = `${formattedDate} at ${formattedTime}`;
-                    } else {
-                        text_activeTrackingLabel.textContent = "Active Tracking: No data available";
-                    }
+                    // Update tracking data every 5 seconds (adjust as needed)
+                    setInterval(async () => {
+                        const newTrackingData = await fetchData(user_accountId);
+                        if (newTrackingData?.activeTrackingData?.length > 0) {
+                            detailsTrackingData.activeTrackingData = newTrackingData.activeTrackingData;
+                            updateTrackingLabel();
+                        }
+                    }, 5000);
 
                     return;
                 }
@@ -200,7 +244,7 @@ function MapWithTracking({ page }) {
                 setTracking(true);
 
                 const arpId = await FetchActiveARP(user_accountId);
-                await handleSaveTracking(arpId, ambulanceId, start_cooridnates[1], start_cooridnates[0], accountId);
+                await handleSaveTracking(arpId, ambulanceId, start_coordinates[1], start_coordinates[0], accountId);
 
                 console.log("Tracking saved successfully");
 
@@ -213,7 +257,6 @@ function MapWithTracking({ page }) {
                     title: 'Tracking Started!',
                     text: 'You are now tracking your location.',
                     icon: 'success',
-                    confirmButtonText: 'OK',
                 });
             } catch (error) {
                 console.error("Error in tracking process:", error);
@@ -222,6 +265,7 @@ function MapWithTracking({ page }) {
 
         processTrackingData();
     };
+
 
 
     const startTrackingInterval = (detailsTrackingData) => {
@@ -259,6 +303,10 @@ function MapWithTracking({ page }) {
         if (trackingInterval.current) {
             clearInterval(trackingInterval.current); // Stop the interval
             trackingInterval.current = null; // Reset the interval reference
+            localStorage.setItem("trackingStatus", "Stop Tracking");
+
+            const storedName = localStorage.getItem("trackingStatus");
+            console.log("Checking storage:", storedName);
 
             setTracking(false); // Disable tracking state
             setHasActiveTracking(false);
@@ -278,6 +326,9 @@ function MapWithTracking({ page }) {
                     confirmButtonText: 'Okay',
                 });
             } else {
+                localStorage.setItem("trackingStatus", "Continue Tracking");
+                const storedName = localStorage.getItem("trackingStatus");
+                console.log("Checking storage:", storedName);
                 const newStartPoint = await getCurrentLocation();
                 startTracking(accountId, newStartPoint);
             }

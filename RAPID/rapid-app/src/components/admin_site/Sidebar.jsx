@@ -78,6 +78,7 @@ function Sidebar({ isVisible }) {
                                 <i className="bi bi-grid"></i>
                                 <span>Dashboard</span>
                             </Link>
+
                         </li>
 
                         <hr />
@@ -108,9 +109,21 @@ function Sidebar({ isVisible }) {
                                 <i className="bx bx-chat"></i>
                                 <span>Messages</span>
                             </Link>
+
                         </li>
 
                         <hr />
+                        <li className="nav-heading">Reports and Statistics</li>
+
+                        <Link
+                            className={`nav-link ${isActive('/admin/manage_reports') ? '' : 'collapsed'}`}
+                            to="/admin/manage_reports" // Use 'to' instead of 'href'
+                        >
+                            <i className="bx bx-chart"></i>
+                            <span>Report and Statistics</span>
+                        </Link>
+                        <hr />
+
                         <li className="nav-heading">CONFIGURATION</li>
 
                         <li className="nav-item">

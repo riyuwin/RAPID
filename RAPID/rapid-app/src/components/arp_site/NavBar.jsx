@@ -93,7 +93,7 @@ function NavBar() {
                 <nav className="header-nav ms-auto">
                     <ul className="d-flex align-items-center">
                         <li className="nav-item dropdown pe-3">
-                            <Link
+                            {/* <Link
                                 className="nav-link nav-profile d-flex align-items-center justify-content-center pe-0"
                                 to="/arp/notification"
                             >
@@ -104,7 +104,7 @@ function NavBar() {
                                     className="rounded-circle"
                                     style={{ width: "25px", height: "25px" }}
                                 />
-                            </Link>
+                            </Link> */}
                         </li>
 
                         {account?.firstName ? (

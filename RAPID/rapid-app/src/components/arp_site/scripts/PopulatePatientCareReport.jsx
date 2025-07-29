@@ -305,7 +305,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
         };
 
         const wound = {
-            "bleedingControl": "bleedingControl",
+            "bleedingControl": "bleedingContol",
             "appliedAntiseptic": "appliedAntiseptic",
             "cleaning": "cleaning",
             "dressingBandaging": "dressingBandaging",
@@ -768,7 +768,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
         }
 
         // Check and populate `natureCall` data if needed
-        if (patientCareDetails[0].mechanismInjury) {
+        /* if (patientCareDetails[0].mechanismInjury) {
             Object.entries(mechanismInjury).forEach(([firestoreField, inputId]) => {
                 const value = patientCareDetails[0].mechanismInjury[firestoreField]; // Get Firestore value
                 if (value !== undefined && value !== null) { // Check for valid value
@@ -787,7 +787,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
                     }
                 }
             });
-        }
+        } */
 
         // Check and populate `natureCall` data if needed
         if (patientCareDetails[0].medical) {
@@ -908,7 +908,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
                     if (inputElement) {
                         // Check if the input is a checkbox
-                        if (inputElement.type === "checkbox") {
+                        if (inputElement.type === "radio") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             inputElement.value = value; // Set the input field value (for text inputs)
@@ -950,7 +950,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
                     if (inputElement) {
                         // Check if the input is a checkbox
-                        if (inputElement.type === "checkbox") {
+                        if (inputElement.type === "radio") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             inputElement.value = value; // Set the input field value (for text inputs)
@@ -971,7 +971,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
                     if (inputElement) {
                         // Check if the input is a checkbox
-                        if (inputElement.type === "checkbox") {
+                        if (inputElement.type === "radio") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             inputElement.value = value; // Set the input field value (for text inputs)
@@ -1013,7 +1013,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
                     if (inputElement) {
                         // Check if the input is a checkbox
-                        if (inputElement.type === "checkbox") {
+                        if (inputElement.type === "radio") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             inputElement.value = value; // Set the input field value (for text inputs)
@@ -1034,7 +1034,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
                     if (inputElement) {
                         // Check if the input is a checkbox
-                        if (inputElement.type === "checkbox") {
+                        if (inputElement.type === "radio") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             inputElement.value = value; // Set the input field value (for text inputs)
@@ -1055,7 +1055,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
                     if (inputElement) {
                         // Check if the input is a checkbox
-                        if (inputElement.type === "checkbox") {
+                        if (inputElement.type === "radio") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             inputElement.value = value; // Set the input field value (for text inputs)
@@ -1076,7 +1076,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
                     if (inputElement) {
                         // Check if the input is a checkbox
-                        if (inputElement.type === "checkbox") {
+                        if (inputElement.type === "radio") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             inputElement.value = value; // Set the input field value (for text inputs)
@@ -1119,7 +1119,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
                     if (inputElement) {
                         // Check if the input is a checkbox
-                        if (inputElement.type === "checkbox") {
+                        if (inputElement.type === "radio") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             inputElement.value = value; // Set the input field value (for text inputs)
@@ -1140,7 +1140,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
                     if (inputElement) {
                         // Check if the input is a checkbox
-                        if (inputElement.type === "checkbox") {
+                        if (inputElement.type === "radio") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             inputElement.value = value; // Set the input field value (for text inputs)
@@ -1392,7 +1392,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
                     if (inputElement) {
                         // Check if the input is a checkbox
-                        if (inputElement.type === "checkbox") {
+                        if (inputElement.type === "radio") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             inputElement.value = value; // Set the input field value (for text inputs)
@@ -1688,7 +1688,7 @@ export const PopulatePatientCareReport = async (patientCareDetails) => {
 
                     if (inputElement) {
                         // Check if the input is a checkbox
-                        if (inputElement.type === "checkbox") {
+                        if (inputElement.type === "radio") {
                             inputElement.checked = value; // Set the checkbox state based on the value
                         } else {
                             inputElement.value = value; // Set the input field value (for text inputs)

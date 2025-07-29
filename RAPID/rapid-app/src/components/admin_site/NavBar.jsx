@@ -51,7 +51,6 @@ function NavBar() {
         return () => unsubscribe();
     }, []);
 
-    // Dropdown initialization once the component has mounted
     useEffect(() => {
         // Ensure Bootstrap is loaded and dropdown is initialized
         if (window.bootstrap) {

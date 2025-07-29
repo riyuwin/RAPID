@@ -1,27 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { firestore } from "../../firebase/firebase"; // Assuming firestore is initialized properly 
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { useEffect, useState, useRef } from "react";
 import { Modal } from "bootstrap";
-import PatientCareReportFetcher from "../arp_site/scripts/PatientCareReportFetcher";
-import { UpdatePatientStatus } from "./scripts/UpdatePatientStatus";
+import FetchLatestPatient from "./scripts/FetchLatestPatient";
+import { UpdateNotifPatient } from "./scripts/UpdateNotifPatient";
+import CharacterModel from "../arp_site/CharacterModel";
 import { ResetForms } from "../arp_site/scripts/ResetForms";
+import PatientCareReportFetcher from "../arp_site/scripts/PatientCareReportFetcher";
+import { useFetchCurrentUser } from "../arp_site/scripts/FetchCurrentUser";
 import { PopulatePatientCareReport } from "../arp_site/scripts/PopulatePatientCareReport";
 
-function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, notifStatus }) {
-    const [modalRemarks, setModalRemarks] = useState("View");
-    const [modalTitle, setModalTitle] = useState("View Patient Care Report");
-    const [viewPatientStatus, setPatientStatus] = useState("Active");
+function PopUpNotification() {
+    const [notifications, setNotifications] = useState([]);
+    const modalRef = useRef(null);
+    const modalInstanceRef = useRef(null);
 
     const [patientCareReportStatus, setPatientCareReportStatus] = useState("Basic Information");
     const [isDisabled, setIsDisabled] = useState(true);
-
-    const [selectedNationality, setSelectedNationality] = useState("");
-    const [otherNationality, setOtherNationality] = useState("");
-
-    // Initialize state with retrieve_PatientID
-    const [retrievePatientID, setRetrievePatientID] = useState(retrieve_PatientID);
+    const [patientDetails, setPatientDetails] = useState(null);
 
     const [isNoLicenseChecked, setIsNoLicenseChecked] = useState(false);
 
@@ -31,7 +25,11 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
 
     const handlePatientCareReportStatus = (e) => {
         setPatientCareReportStatus(e.target.value);
-    };
+    }
+
+    /* Nationality Selector */
+    const [selectedNationality, setSelectedNationality] = useState("");
+    const [otherNationality, setOtherNationality] = useState("");
 
     const handleNationalityChange = (e) => {
         setSelectedNationality(e.target.value);
@@ -41,132 +39,190 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
         setOtherNationality(e.target.value);
     };
 
-    const handleViewClick = (patientId) => {
-        if (!patientId) {
-            console.error("Invalid Patient ID:", patientId);
-            return;
+    useEffect(() => {
+        const unsubscribe = FetchLatestPatient((data) => {
+            if (data.length > 0) {
+                const sortedData = [...data].sort((a, b) => b.savedAt.seconds - a.savedAt.seconds);
+                setNotifications(sortedData);
+                openModal();
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    useEffect(() => {
+        if (modalRef.current) {
+            modalInstanceRef.current = new Modal(modalRef.current);
+
+            modalRef.current.addEventListener("hidden.bs.modal", () => {
+                setNotifications([]); // Clear notifications when modal is closed
+            });
         }
+    }, []);
+
+    const openModal = () => {
+        if (modalInstanceRef.current) {
+            modalInstanceRef.current.show();
+        }
+    };
+
+    const closeModal = () => {
+        if (modalInstanceRef.current) {
+            modalInstanceRef.current.hide();
+        }
+    };
+
+    const handleMarkAsRead = async (patientId) => {
+        await UpdateNotifPatient(patientId, "Read");
+        setNotifications((prev) => prev.filter((notif) => notif.id !== patientId));
+
+        if (notifications.length === 1) {
+            closeModal();
+        }
+    };
+
+    const [editPatientID, setPatientID] = useState("");
+    const [viewPatientStatus, setPatientStatus] = useState("");
+    const [modalRemarks, setModalRemarks] = useState("");
+    const [showSubmit, setShowSubmit] = useState(true);
+    const [actionParameter, setActionParameter] = useState(null);
+    const [modalTitle, setModalTitle] = useState("");
+    const { accountId, currentUserloading } = useFetchCurrentUser();
+
+    const handleViewClick = (patientId, patient_status, remarks) => {
 
         ResetForms();
 
+        // Call the fetch function and log the data
         PatientCareReportFetcher(patientId, (data, err) => {
             if (err) {
                 console.error("Error fetching data:", err);
-            } else if (data && data.length > 0) {
-                console.log("HHUU", data.patient_status)
-                setPatientStatus(data.patient_status)
-
-                PopulatePatientCareReport(data);
             } else {
-                console.error("No data returned for patient ID:", patientId);
+
+                // Ensure valid data is passed to PopulatePatientCareReport
+                if (data && data.length > 0) {
+                    setPatientID(patientId)
+                    PopulatePatientCareReport(data);
+                    setShowSubmit(false);
+                    setPatientStatus(patient_status)
+                    setModalRemarks(remarks);
+
+                    setPatientDetails(data);
+                } else {
+                    console.error("No data returned for patient ID:", patientId);
+                }
             }
         });
     };
 
-    const handleHidePatientCareFormModal = () => {
-        const modalElement = document.getElementById("viewPatientCareReport");
-        if (modalElement) {
-            const modal = Modal.getInstance(modalElement) || new Modal(modalElement);
-            modal.hide();
-
-            setTimeout(() => {
-                // 🔥 Force remove any existing backdrops
-                document.querySelectorAll(".modal-backdrop").forEach(backdrop => backdrop.remove());
-
-                // 🔥 Reset body styles
-                document.body.classList.remove("modal-open");
-                document.body.style.overflow = "auto";
-                document.body.style.paddingRight = "0px"; // Fix Bootstrap scrollbar issue
-            }, 300);
-        } else {
-            console.error("Modal element not found!");
-        }
-    };
-
-    // Trigger fetch when retrieve_PatientID changes
-    useEffect(() => {
-        if (retrieve_PatientID) {
-            setRetrievePatientID(retrieve_PatientID);
-            handleViewClick(retrieve_PatientID);
-        }
-    }, [retrieve_PatientID]);
-
-
-    const [characterModelData, setCharacterModelData] =
-        useState({
-            rightHead: false,
-            rightNeck: false,
-            rightShoulder: false,
-            rightChest: false,
-            rightArm: false,
-            rightHand: false,
-            rightAbdomen: false,
-            rightHip: false,
-            rightThigh: false,
-            rightKnee: false,
-            rightShin: false,
-            rightFoot: false,
-            leftHead: false,
-            leftNeck: false,
-            leftShoulder: false,
-            leftChest: false,
-            leftArm: false,
-            leftHand: false,
-            leftAbdomen: false,
-            leftHip: false,
-            leftThigh: false,
-            leftKnee: false,
-            leftShin: false,
-            leftFoot: false,
-
-            rightBackHead: false,
-            rightBackNeck: false,
-            rightBackShoulder: false,
-            rightBackArm: false,
-            rightBackHand: false,
-            rightBackUpperBack: false,
-            rightBackLowerBack: false,
-            rightBackHip: false,
-            rightBackThigh: false,
-            rightCalf: false,
-            rightBackFoot: false,
-            leftBackHead: false,
-            leftBackNeck: false,
-            leftBackShoulder: false,
-            leftBackArm: false,
-            leftBackHand: false,
-            leftBackUpperBack: false,
-            leftBackLowerBack: false,
-            leftBackHip: false,
-            leftBackThigh: false,
-            leftCalf: false,
-            leftBackFoot: false,
-        });
-
-    // useEffect runs every time characterModelData.rightHead changes
-    useEffect(() => {
-        console.log("rightHead state changed:", characterModelData.rightHead);
-        console.log("leftHead state changed:", characterModelData.leftHead);
-
-        // Any logic you want to trigger when rightHead updates
-    }, [characterModelData.rightHead, characterModelData.leftHead]); // 👈 Depend on rightHead state
-
     return (
         <>
-            {/* Modal for selecting ambulance */}
+            <div className="modal fade" id="popUpNotifModal" tabIndex="-1" ref={modalRef} aria-labelledby="popUpNotifModal" aria-hidden="true">
+                <div className="modal-dialog modal-xl">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">Patient Care Report Unread Notifications</h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={closeModal} aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            <div style={{ overflowX: "auto" }}>
+                                {notifications.length > 0 ? (
+                                    <table className="table table-striped text-center align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Patient Name</th>
+                                                <th>Responder Name</th>
+                                                <th>Triage Tagging</th>
+                                                <th>Datetime Reported</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {notifications.map((notif, index) => {
+                                                /* let triageClass = "triage-default"; // Default class
 
-            <div className="modal fade" id="viewPatientCareReport" tabindex="-1" aria-labelledby="addPatientCareReport" aria-hidden="true">
+                                                if (notif.triageTagging.triageTaggingB) {
+                                                    triageClass = "triage-blue";
+                                                } else if (notif.triageTagging.triageTaggingG) {
+                                                    triageClass = "triage-green";
+                                                } else if (notif.triageTagging.triageTaggingR) {
+                                                    triageClass = "triage-red";
+                                                } else if (notif.triageTagging.triageTaggingY) {
+                                                    triageClass = "triage-yellow";
+                                                } */
+
+                                                return (
+                                                    <tr key={notif.id} className={` text-center align-middle`}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{notif.basicInformation.firstName} {notif.basicInformation.middleName} {notif.basicInformation.surname}</td>
+                                                        <td>{notif.accountData.firstName} {notif.accountData.middleName} {notif.accountData.lastName}</td>
+                                                        <td>
+                                                            <div className={`triage-box 
+                                                                ${notif.triageTagging.triageTaggingB ? "triage-blue" : ""}
+                                                                ${notif.triageTagging.triageTaggingG ? "triage-green" : ""}
+                                                                ${notif.triageTagging.triageTaggingR ? "triage-red" : ""}
+                                                                ${notif.triageTagging.triageTaggingY ? "triage-yellow" : ""}`}>
+                                                                {notif.triageTagging.triageTaggingB
+                                                                    ? "B"
+                                                                    : notif.triageTagging.triageTaggingG
+                                                                        ? "G"
+                                                                        : notif.triageTagging.triageTaggingR
+                                                                            ? "R"
+                                                                            : notif.triageTagging.triageTaggingY
+                                                                                ? "Y"
+                                                                                : "N/A"}
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            {notif.savedAt
+                                                                ? new Date(notif.savedAt.seconds * 1000).toLocaleString("en-US", {
+                                                                    month: "long",
+                                                                    day: "2-digit",
+                                                                    year: "numeric",
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit",
+                                                                    hour12: true,
+                                                                })
+                                                                : "N/A"}
+                                                        </td>
+                                                        <td>
+                                                            <div className="d-flex justify-content-center gap-2">
+                                                                <button className="btn btn-secondary btn-sm" onClick={() => handleViewClick(notif.patientId, notif.patient_status, "View")}
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#addPatientCareReport">
+                                                                    <i class="bi bi-eye"></i> &nbsp;
+                                                                    View
+                                                                </button>
+                                                                <button className="btn btn-secondary btn-sm" onClick={() => handleMarkAsRead(notif.id)}>
+                                                                    <i class="bi bi-envelope-check"></i> &nbsp;
+                                                                    Mark as Read
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+
+                                ) : (
+                                    <p>No unread notifications.</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="modal fade" id="addPatientCareReport" tabindex="-1" aria-labelledby="addPatientCareReport" aria-hidden="true">
                 <div className="modal-dialog modal-xl"> {/* Apply modal-lg for a larger width */}
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title" id="modalTitle">{modalTitle}</h5>
-                            {/* <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick = {() => {handleHidePatientCareFormModal()}} ></button> */}
-                            <button
-                                type="button"
-                                className="btn-close"
-                                aria-label="Close"
-                                onClick={handleHidePatientCareFormModal} // No need for extra arrow function
-                            ></button>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <form  >
                             <div className="modal-body ">
@@ -176,12 +232,12 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
 
                                     <div className="row">
 
-                                        {notifStatus === "UpdatePatientStatus" &&
+                                        {modalRemarks == "View" &&
                                             <>
                                                 <div className="label_container">
                                                     <div className="row d-flex justify-content-start align-items-start">
                                                         <div className="col-md-6">
-                                                            <label style={{ color: 'black', marginBottom: '10px' }} for="ambulanceInput">Patient Report Status:<b> {retrieve_transactionStatus} </b></label>
+                                                            <label style={{ color: 'black', marginBottom: '10px' }} for="ambulanceInput">Patient Report Status:<b> {viewPatientStatus} </b></label>
                                                         </div>
 
                                                         <div className="col-md-6 d-flex justify-content-end align-items-end">
@@ -191,59 +247,6 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
                                                 </div>
                                             </>
                                         }
-
-                                        {/* {modalRemarks == "View" &&
-                                            <>
-                                                <div className="label_container">
-                                                    <div className="row d-flex justify-content-start align-items-start">
-                                                        <div className="col-md-6">
-                                                            <label style={{ color: 'black', marginBottom: '10px' }} for="ambulanceInput">Patient Report Status:<b> {retrieve_transactionStatus} </b></label>
-                                                        </div>
-
-                                                        <div className="col-md-6 d-flex justify-content-end align-items-end">
-                                                            < GeneratePdf />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        }
-
-                                        {modalRemarks == "Edit" &&
-                                            <>
-                                                <div className="label_container">
-                                                    <div className="row d-flex justify-content-start align-items-start">
-                                                        <div className="col-md-12">
-                                                            <p style={{ color: 'black', marginTop: '10px' }} for="ambulanceInput"><i>Note: You can update the status of the report by selecting one of the following options.  </i> </p><br></br>
-                                                        </div>
-
-                                                        <div className="col-md-12 d-flex justify-content-start align-items-start" >
-                                                            <label style={{ color: 'black', marginBottom: '10px' }} for="ambulanceInput">Select Report Status:   </label>
-                                                        </div>
-
-                                                        <div className="col-md-12 d-flex justify-content-start align-items-start">
-                                                            <button className="btn btn-success btn-sm" style={{ marginRight: '10px' }}
-                                                                type="button"
-                                                                onClick={() => { UpdatePatientStatus(editPatientID, accountId, "Completed") }}>
-                                                                <i className="fa fa-check"></i> Completed
-                                                            </button>
-
-                                                            <button className="btn btn-primary btn-sm" style={{ marginRight: '10px' }}
-                                                                type="button"
-                                                                onClick={() => { UpdatePatientStatus(editPatientID, accountId, "Active") }}>
-                                                                <i className="fa fa-circle"></i> Active
-                                                            </button>
-
-                                                            <button className="btn btn-danger btn-sm" style={{ marginRight: '10px' }}
-                                                                type="button"
-                                                                onClick={() => { UpdatePatientStatus(editPatientID, accountId, "Did Not Arrive") }}>
-                                                                <i className="fa fa-times"></i> Did Not Arrive
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                            </>
-                                        } */}
 
 
                                         <div className="label_container">
@@ -297,7 +300,7 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
                                                         <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput">Call Received: <span className='required-form'>*</span></label>
                                                         <input
                                                             id='callReceived'
-                                                            type="text"
+                                                            type="time"
                                                             className="form-control"
                                                         />
                                                     </div>
@@ -306,7 +309,7 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
                                                         <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">To Scene: <span className='required-form'>*</span></label>
                                                         <input
                                                             id='toScene'
-                                                            type="text"
+                                                            type="time"
                                                             className="form-control"
                                                         />
                                                     </div>
@@ -315,7 +318,7 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
                                                         <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">At Scene: <span className='required-form'>*</span></label>
                                                         <input
                                                             id='atSceneInput'
-                                                            type="text"
+                                                            type="time"
                                                             className="form-control"
                                                         />
                                                     </div>
@@ -324,7 +327,7 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
                                                         <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">To Hospital: <span className='required-form'>*</span></label>
                                                         <input
                                                             id='toHospitalInput'
-                                                            type="text"
+                                                            type="time"
                                                             className="form-control"
                                                         />
                                                     </div>
@@ -333,7 +336,7 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
                                                         <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">At Hospital: <span className='required-form'>*</span></label>
                                                         <input
                                                             id='atHospitalInput'
-                                                            type="text"
+                                                            type="time"
                                                             className="form-control"
                                                         />
                                                     </div>
@@ -342,7 +345,7 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
                                                         <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2">Base: <span className='required-form'>*</span></label>
                                                         <input
                                                             id='baseInput'
-                                                            type="text"
+                                                            type="time"
                                                             className="form-control"
                                                         />
                                                     </div>
@@ -555,10 +558,10 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
                                                         <br /> <hr />
                                                         <div className="form-check">
                                                             <input type="checkbox" id="obsGynHaemorrhage" name="obsGyn" className="form-check-input" />
-                                                            <label htmlFor="obsGynHaemorrhage" className="form-check-label">Haemorrhage &lt; 24 Wks of Pregnancy</label><br />
+                                                            <label htmlFor="obsGynHaemorrhage" className="form-check-label">Haemorrhage &lt; 24 Wks</label><br />
 
                                                             <input type="checkbox" id="obsGynHaemorrhageLess" name="obsGyn" className="form-check-input" />
-                                                            <label htmlFor="obsGynHaemorrhageLess" className="form-check-label">Haemorrhage &gt; 24 Wks of Pregnancy</label><br />
+                                                            <label htmlFor="obsGynHaemorrhageLess" className="form-check-label">Haemorrhage &gt; 24 Wks</label><br />
 
                                                             <input type="checkbox" id="obsGynLabour" name="obsGyn" className="form-check-input" />
                                                             <label htmlFor="obsGynLabour" className="form-check-label">Labour</label><br />
@@ -732,7 +735,7 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
                                                     </div> */}
 
                                                     <div className="col-md-3">
-                                                        <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="medicalBackPain">Hypothermia:</label>
+                                                        <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="medicalBackPain">Medical:</label>
 
                                                         <br /> <hr />
                                                         <div className="form-check">
@@ -1787,1194 +1790,8 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
 
                                             <div style={{ display: patientCareReportStatus === "Character Model" ? "block" : "none" }}>
                                                 <div className="row">
-                                                    <div className="col-md-6 position-relative d-flex justify-content-center align-items-center">
-                                                        <div style={{ position: "relative", maxWidth: "100%", height: "auto" }}>
-                                                            <img
-                                                                src="/assets/img/character_model.png"
-                                                                alt="Character Model"
-                                                                className="img-fluid"
-                                                                style={{ width: "100%", height: "auto" }}
-                                                            />
 
-                                                            {characterModelData.rightHead && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightHead.png"
-                                                                    alt="Right Head"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "2%",
-                                                                        left: "21%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "4.5%",
-                                                                        height: "13%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightNeck && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightNeck.png"
-                                                                    alt="Right Head"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "12%",
-                                                                        left: "21.7%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "3.4%",
-                                                                        height: "5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightShoulder && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightShoulder.png"
-                                                                    alt="Right Head"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "17.7%",
-                                                                        left: "12.9%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "3.8%",
-                                                                        height: "5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightChest && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightChest.png"
-                                                                    alt="Left Chest"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "15.6%",
-                                                                        left: "19%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8.7%",
-                                                                        height: "14.5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightArm && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightArm.png"
-                                                                    alt="Right Arm"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "22.4%",
-                                                                        left: "10.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "9.3%",
-                                                                        height: "29%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightHand && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightHand.png"
-                                                                    alt="Right Arm"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "50.5%",
-                                                                        left: "5.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8%",
-                                                                        height: "10.5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightAbdomen && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightAbdomen.png"
-                                                                    alt="Right Abdomen"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "30%",
-                                                                        left: "19.2%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8.5%",
-                                                                        height: "14%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightHip && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightHips.png"
-                                                                    alt="Right Hip"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "44%",
-                                                                        left: "19.2%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8.5%",
-                                                                        height: "5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-
-                                                            {characterModelData.rightThigh && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightThigh.png"
-                                                                    alt="Left Hip"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "49%",
-                                                                        left: "19.3%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8.7%",
-                                                                        height: "21%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightKnee && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightKnee.png"
-                                                                    alt="Right Knee"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "70%",
-                                                                        left: "20.4%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "6%",
-                                                                        height: "7%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightShin && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightShin.png"
-                                                                    alt="Right Shin"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "77%",
-                                                                        left: "20.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "6.1%",
-                                                                        height: "17%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightFoot && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/RightFoot.png"
-                                                                    alt="Right Foot"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "94%",
-                                                                        left: "21.1%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "6.1%",
-                                                                        height: "4%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftHead && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftHead.png"
-                                                                    alt="Right Head"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "2%",
-                                                                        left: "25.44%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "4.5%",
-                                                                        height: "13%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftNeck && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftNeck.png"
-                                                                    alt="Right Head"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "12%",
-                                                                        left: "24.8%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "3%",
-                                                                        height: "5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftShoulder && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftShoulder.png"
-                                                                    alt="Left Shoulder"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "17.7%",
-                                                                        left: "33.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "3.8%",
-                                                                        height: "5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftChest && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftChest.png"
-                                                                    alt="Left Chest"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "15.6%",
-                                                                        left: "27.4%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8.7%",
-                                                                        height: "14.5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-
-                                                            {characterModelData.leftArm && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftArm.png"
-                                                                    alt="Left Arm"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "22.4%",
-                                                                        left: "36.3%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "9.6%",
-                                                                        height: "29%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftHand && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftHand.png"
-                                                                    alt="Right Arm"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "50.5%",
-                                                                        left: "41.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "7.5%",
-                                                                        height: "10.5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftAbdomen && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftAbdomen.png"
-                                                                    alt="Left Abdomen"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "30%",
-                                                                        left: "27.4%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8.5%",
-                                                                        height: "14%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftHip && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftHips.png"
-                                                                    alt="Left Hip"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "44%",
-                                                                        left: "27.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8.9%",
-                                                                        height: "5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftThigh && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftThigh.png"
-                                                                    alt="Left Hip"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "49%",
-                                                                        left: "27.8%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8.7%",
-                                                                        height: "21%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-
-                                                            {characterModelData.leftKnee && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftKnee.png"
-                                                                    alt="Left Knee"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "70%",
-                                                                        left: "26.7%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "6%",
-                                                                        height: "7%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftShin && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftShin.png"
-                                                                    alt="Left Shin"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "77%",
-                                                                        left: "27.2%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "6.1%",
-                                                                        height: "17%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftFoot && (
-                                                                <img
-                                                                    src="/assets/img/FrontModel/LeftFoot.png"
-                                                                    alt="Left Foot"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "94%",
-                                                                        left: "27.1%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "6.1%",
-                                                                        height: "4%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightBackHead && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/RightBackHead.png"
-                                                                    alt="Right Back Head Foot"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "2%",
-                                                                        left: "76.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "5%",
-                                                                        height: "11%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightBackNeck && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/RightBackNeck.png"
-                                                                    alt="Right Back Neck"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "13%",
-                                                                        left: "75.7%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "3.5%",
-                                                                        height: "3.5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightBackShoulder && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/RightBackShoulder.png"
-                                                                    alt="Right Back Neck"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "17.5%",
-                                                                        left: "84.2%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "5%",
-                                                                        height: "5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightBackArm && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/RightBackArm.png"
-                                                                    alt="Right Back Neck"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "22.5%",
-                                                                        left: "87.2%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "11%",
-                                                                        height: "28%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightBackHand && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/RightBackHand.png"
-                                                                    alt="Right Back Neck"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "49.5%",
-                                                                        left: "92.2%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "7%",
-                                                                        height: "11%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightBackUpperBack && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/RightUpperBack.png"
-                                                                    alt="Right Back Upper Back"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "15%",
-                                                                        left: "78.1%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8%",
-                                                                        height: "15%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightBackLowerBack && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/RightLowerBack.png"
-                                                                    alt="Right Back Neck"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "30%",
-                                                                        left: "78.3%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8.5%",
-                                                                        height: "17%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightBackHip && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/RightBackHip.png"
-                                                                    alt="Right Back Hip"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "47%",
-                                                                        left: "78.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "9.2%",
-                                                                        height: "8%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightBackThigh && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/RightBackThigh.png"
-                                                                    alt="Right Back Thigh"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "55%",
-                                                                        left: "78.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8%",
-                                                                        height: "17%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightCalf && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/RightBackCalf.png"
-                                                                    alt="Right Back Thigh"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "71.8%",
-                                                                        left: "78%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "6%",
-                                                                        height: "23%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.rightBackFoot && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/RightBackFoot.png"
-                                                                    alt="Right Back Thigh"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "95%",
-                                                                        left: "78%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "6%",
-                                                                        height: "3%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftBackHead && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/LeftBackHead.png"
-                                                                    alt="Left Back Head"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "2%",
-                                                                        left: "71.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "5%",
-                                                                        height: "11%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-
-                                                            {characterModelData.leftBackNeck && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/LeftBackNeck.png"
-                                                                    alt="Left Back Neck"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "13%",
-                                                                        left: "72.3%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "3.5%",
-                                                                        height: "3.5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftBackUpperBack && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/LeftUpperBack.png"
-                                                                    alt="Left Upper Back"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "15%",
-                                                                        left: "70.3%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8%",
-                                                                        height: "15%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftBackShoulder && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/LeftBackShoulder.png"
-                                                                    alt="Left Back Neck"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "17.5%",
-                                                                        left: "64%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "5%",
-                                                                        height: "5%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftBackArm && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/LeftBackArm.png"
-                                                                    alt="Right Back Neck"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "22.5%",
-                                                                        left: "61.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "11%",
-                                                                        height: "28%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftBackHand && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/LeftBackHand.png"
-                                                                    alt="Right Back Neck"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "49.4%",
-                                                                        left: "56.5%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "7%",
-                                                                        height: "12%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftBackLowerBack && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/LeftLowerBack.png"
-                                                                    alt="Right Back Neck"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "30%",
-                                                                        left: "69.9%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8%",
-                                                                        height: "17%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftBackHip && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/LeftBackHip.png"
-                                                                    alt="Left Back Hip"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "47%",
-                                                                        left: "70%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "9.2%",
-                                                                        height: "8%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftBackThigh && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/LeftBackThigh.png"
-                                                                    alt="Left Back Thigh"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "55%",
-                                                                        left: "70%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "8%",
-                                                                        height: "17%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftCalf && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/LeftBackCalf.png"
-                                                                    alt="Left Back Thigh"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "71.8%",
-                                                                        left: "71%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "6%",
-                                                                        height: "23%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {characterModelData.leftBackFoot && (
-                                                                <img
-                                                                    src="/assets/img/BackModel/LeftBackFoot.png"
-                                                                    alt="Left Back Foot"
-                                                                    style={{
-                                                                        position: "absolute",
-                                                                        top: "95%",
-                                                                        left: "71%",
-                                                                        transform: "translateX(-50%)",
-                                                                        width: "6%",
-                                                                        height: "3%"
-                                                                    }}
-                                                                />
-                                                            )}
-
-
-                                                        </div>
-                                                    </div>
-
-
-
-                                                    <div class="col-md-2">
-                                                        <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2"><b>Front Model</b></label>
-                                                        <hr />
-
-                                                        <div class="form-check">
-                                                            <div class="form-check">
-                                                                <input type="checkbox" id="rightHead" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightHead}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightHead: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightHead" class="form-check-label">Right Head</label><br />
-
-                                                                <input type="checkbox" id="rightNeck" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightNeck}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightNeck: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightNeck" class="form-check-label">Right Neck</label><br />
-
-                                                                <input type="checkbox" id="rightShoulder" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightShoulder}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightShoulder: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightShoulder" class="form-check-label">Right Shoulder</label><br />
-
-                                                                <input type="checkbox" id="rightArm" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightArm}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightArm: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightArm" class="form-check-label">Right Arm</label><br />
-
-                                                                <input type="checkbox" id="rightHand" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightHand}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightHand: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightHand" class="form-check-label">Right Hand</label><br />
-
-                                                                <input type="checkbox" id="rightChest" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightChest}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightChest: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightChest" class="form-check-label">Right Chest</label><br />
-
-                                                                <input type="checkbox" id="rightAbdomen" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightAbdomen}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightAbdomen: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightAbdomen" class="form-check-label">Right Abdomen</label><br />
-
-                                                                <input type="checkbox" id="rightHip" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightHip}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightHip: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightHip" class="form-check-label">Right Hip</label><br />
-
-                                                                <input type="checkbox" id="rightThigh" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightThigh}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightThigh: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightThigh" class="form-check-label">Right Thigh</label><br />
-
-                                                                <input type="checkbox" id="rightKnee" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightKnee}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightKnee: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightKnee" class="form-check-label">Right Knee</label><br />
-
-                                                                <input type="checkbox" id="rightShin" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightShin}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightShin: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightShin" class="form-check-label">Right Shin</label><br />
-
-                                                                <input type="checkbox" id="rightFoot" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.rightFoot}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            rightFoot: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="rightFoot" class="form-check-label">Right Foot</label><br /><br /><br />
-
-                                                                <input type="checkbox" id="leftHead" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftHead}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftHead: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftHead" class="form-check-label">Left Head</label><br />
-
-                                                                <input type="checkbox" id="leftNeck" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftNeck}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftNeck: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftNeck" class="form-check-label">Left Neck</label><br />
-
-                                                                <input type="checkbox" id="leftShoulder" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftShoulder}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftShoulder: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftShoulder" class="form-check-label">Left Shoulder</label><br />
-
-                                                                <input type="checkbox" id="leftArm" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftArm}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftArm: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftArm" class="form-check-label">Left Arm</label><br />
-
-                                                                <input type="checkbox" id="leftHand" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftHand}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftHand: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftHand" class="form-check-label">Left Hand</label><br />
-
-                                                                <input type="checkbox" id="leftChest" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftChest}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftChest: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftChest" class="form-check-label">Left Chest</label><br />
-
-                                                                <input type="checkbox" id="leftAbdomen" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftAbdomen}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftAbdomen: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftAbdomen" class="form-check-label">Left Abdomen</label><br />
-
-                                                                <input type="checkbox" id="leftHip" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftHip}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftHip: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftHip" class="form-check-label">Left Hip</label><br />
-
-                                                                <input type="checkbox" id="leftThigh" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftThigh}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftThigh: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftThigh" class="form-check-label">Left Thigh</label><br />
-
-                                                                <input type="checkbox" id="leftKnee" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftKnee}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftKnee: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftKnee" class="form-check-label">Left Knee</label><br />
-
-                                                                <input type="checkbox" id="leftShin" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftShin}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftShin: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftShin" class="form-check-label">Left Shin</label><br />
-
-                                                                <input type="checkbox" id="leftFoot" name="charactermodel" class="form-check-input"
-                                                                    checked={characterModelData.leftFoot}
-                                                                    onChange={(e) =>
-                                                                        setCharacterModelData(prev => ({
-                                                                            ...prev,
-                                                                            leftFoot: e.target.checked
-                                                                        }))
-                                                                    } />
-                                                                <label for="leftFoot" class="form-check-label">Left Foot</label><br /><br />
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-
-
-                                                    <div class="col-md-2">
-                                                        <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2"><b>Back Model</b></label>
-                                                        <hr />
-
-                                                        <div class="form-check">
-                                                            <input type="checkbox" id="rightBackHead" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.rightBackHead}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        rightBackHead: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="rightBackHead" class="form-check-label">Right Back Head</label><br />
-
-                                                            <input type="checkbox" id="rightBackNeck" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.rightBackNeck}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        rightBackNeck: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="rightBackNeck" class="form-check-label">Right Back Neck</label><br />
-
-                                                            <input type="checkbox" id="rightBackShoulder" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.rightBackShoulder}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        rightBackShoulder: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="rightBackShoulder" class="form-check-label">Right Back Shoulder</label><br />
-
-                                                            <input type="checkbox" id="rightBackArm" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.rightBackArm}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        rightBackArm: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="rightBackArm" class="form-check-label">Right Back Arm</label><br />
-
-                                                            <input type="checkbox" id="rightBackHand" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.rightBackHand}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        rightBackHand: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="rightBackHand" class="form-check-label">Right Back Hand</label><br />
-
-                                                            <input type="checkbox" id="rightBackUpperBack" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.rightBackUpperBack}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        rightBackUpperBack: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="rightBackUpperBack" class="form-check-label">Right Upper Back</label><br />
-
-                                                            <input type="checkbox" id="rightBackLowerBack" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.rightBackLowerBack}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        rightBackLowerBack: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="rightBackLowerBack" class="form-check-label">Right Lower Back</label><br />
-
-                                                            <input type="checkbox" id="rightBackHip" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.rightBackHip}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        rightBackHip: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="rightBackHip" class="form-check-label">Right Back Hip</label><br />
-
-                                                            <input type="checkbox" id="rightBackThigh" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.rightBackThigh}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        rightBackThigh: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="rightBackThigh" class="form-check-label">Right Back Thigh</label><br />
-
-                                                            <input type="checkbox" id="rightCalf" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.rightCalf}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        rightCalf: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="rightCalf" class="form-check-label">Right Calf</label><br />
-
-                                                            <input type="checkbox" id="rightBackFoot" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.rightBackFoot}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        rightBackFoot: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="rightBackFoot" class="form-check-label">Right Back Foot</label><br /><br />
-
-                                                            <input type="checkbox" id="leftBackHead" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.leftBackHead}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        leftBackHead: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="leftBackHead" class="form-check-label">Left Back Head</label><br />
-
-                                                            <input type="checkbox" id="leftBackNeck" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.leftBackNeck}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        leftBackNeck: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="leftBackNeck" class="form-check-label">Left Back Neck</label><br />
-
-                                                            <input type="checkbox" id="leftBackShoulder" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.leftBackShoulder}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        leftBackShoulder: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="leftBackShoulder" class="form-check-label">Left Back Shoulder</label><br />
-
-                                                            <input type="checkbox" id="leftBackArm" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.leftBackArm}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        leftBackArm: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="leftBackArm" class="form-check-label">Left Back Arm</label><br />
-
-                                                            <input type="checkbox" id="leftBackHand" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.leftBackHand}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        leftBackHand: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="leftBackHand" class="form-check-label">Left Back Hand</label><br />
-
-                                                            <input type="checkbox" id="leftBackUpperBack" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.leftBackUpperBack}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        leftBackUpperBack: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="leftBackUpperBack" class="form-check-label">Left Upper Back</label><br />
-
-                                                            <input type="checkbox" id="leftBackLowerBack" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.leftBackLowerBack}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        leftBackLowerBack: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="leftBackLowerBack" class="form-check-label">Left Lower Back</label><br />
-
-                                                            <input type="checkbox" id="leftBackHip" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.leftBackHip}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        leftBackHip: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="leftBackHip" class="form-check-label">Left Back Hip</label><br />
-
-                                                            <input type="checkbox" id="leftBackThigh" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.leftBackThigh}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        leftBackThigh: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="leftBackThigh" class="form-check-label">Left Back Thigh</label><br />
-
-                                                            <input type="checkbox" id="leftCalf" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.leftCalf}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        leftCalf: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="leftCalf" class="form-check-label">Left Calf</label><br />
-
-                                                            <input type="checkbox" id="leftBackFoot" name="charactermodel" class="form-check-input"
-                                                                checked={characterModelData.leftBackFoot}
-                                                                onChange={(e) =>
-                                                                    setCharacterModelData(prev => ({
-                                                                        ...prev,
-                                                                        leftBackFoot: e.target.checked
-                                                                    }))
-                                                                } />
-                                                            <label for="leftBackFoot" class="form-check-label">Left Back Foot</label><br />
-
-                                                        </div>
-
-                                                    </div>
+                                                    <CharacterModel data={patientDetails} />
 
                                                     <div class="col-md-2">
                                                         <label style={{ color: 'black', marginBottom: '10px', marginTop: '10px' }} htmlFor="ambulanceInput2"><b>Patient Conditions</b></label>
@@ -4084,26 +2901,14 @@ function PatientCareFormModal({ retrieve_PatientID, retrieve_transactionStatus, 
                                 </div>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal"
-                                    onClick={handleHidePatientCareFormModal}>Close</button>
-                                {/* <button type="submit" className="btn btn-primary" id='saveChangesBtn' >Save changes</button> */}
-                                {/* {showSubmit && (
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary"
-                                        id="saveChangesBtn"
-                                    >
-                                        Save changes
-                                    </button>
-                                )} */}
+                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div >
-
         </>
     );
 }
 
-export default PatientCareFormModal;
+export default PopUpNotification;

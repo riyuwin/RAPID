@@ -3,6 +3,7 @@ import { firestore } from '../../../firebase/firebase';
 import { addDoc, collection, getDocs, query, where, doc, onSnapshot, updateDoc, serverTimestamp } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import Swal from 'sweetalert2';
+import { ResetForms } from './ResetForms';
 
 export const handleSavePatientCareReport = async (accountId, ambulanceId) => {
 
@@ -162,11 +163,11 @@ export const handleSavePatientCareReport = async (accountId, ambulanceId) => {
         if (getCheckboxValueIfChecked('mechanismInjuryStumble')) mechanismInjury['mechanismInjuryStumble'] = true;
         if (getCheckboxValueIfChecked('mechanismInjuryWater')) mechanismInjury['mechanismInjuryWater'] = true;
 
-        const mechanismInjuryOtherChecked = getCheckboxValueIfChecked('mechanismInjuryOther');
+        /* const mechanismInjuryOtherChecked = getCheckboxValueIfChecked('mechanismInjuryOther');
         const mechanismInjuryOtherInputValue = getValueInputIfNotEmpty('mechanismInjuryOtherInput');
         if (mechanismInjuryOtherInputValue) {
             mechanismInjury['mechanismInjuryOtherInput'] = mechanismInjuryOtherInputValue;
-        }
+        } */
 
         const medical = {};
         if (getCheckboxValueIfChecked('medicalBackPain')) medical['medicalBackPain'] = true;
@@ -548,10 +549,10 @@ export const handleSavePatientCareReport = async (accountId, ambulanceId) => {
         if (getValueInputIfNotEmpty('vehicularAccidentDetails')) part2['vehicularAccidentDetails'] = getValueInputIfNotEmpty('vehicularAccidentDetails');
 
         const classification = {};
-        if (getValueInputIfNotEmpty('classificationPrivate')) classification['classificationPrivate'] = getValueInputIfNotEmpty('classificationPrivate');
-        if (getValueInputIfNotEmpty('classificationPublic')) classification['classificationPublic'] = getValueInputIfNotEmpty('classificationPublic');
-        if (getValueInputIfNotEmpty('classificationGovernment')) classification['classificationGovernment'] = getValueInputIfNotEmpty('classificationGovernment');
-        if (getValueInputIfNotEmpty('classificationDiplomat')) classification['classificationDiplomat'] = getValueInputIfNotEmpty('classificationDiplomat');
+        if (getCheckboxValueIfChecked('classificationPrivate')) classification['classificationPrivate'] = getCheckboxValueIfChecked('classificationPrivate');
+        if (getCheckboxValueIfChecked('classificationPublic')) classification['classificationPublic'] = getCheckboxValueIfChecked('classificationPublic');
+        if (getCheckboxValueIfChecked('classificationGovernment')) classification['classificationGovernment'] = getCheckboxValueIfChecked('classificationGovernment');
+        if (getCheckboxValueIfChecked('classificationDiplomat')) classification['classificationDiplomat'] = getCheckboxValueIfChecked('classificationDiplomat');
 
         const typeVehicle = {};
         if (getCheckboxValueIfChecked('motorcycle')) typeVehicle['motorcycle'] = getCheckboxValueIfChecked('motorcycle');
@@ -717,7 +718,8 @@ export const handleSavePatientCareReport = async (accountId, ambulanceId) => {
                 savedAt: serverTimestamp(), // Add server timestamp
                 ambulancePersonelId: accountId,
                 patient_status: "Active",
-                ambulanceId: ambulanceId
+                ambulanceId: ambulanceId,
+                notificationStatus: "Unread",
             });
 
             console.log("Document written with ID: ", docRef.id);
@@ -736,9 +738,15 @@ export const handleSavePatientCareReport = async (accountId, ambulanceId) => {
             Swal.fire({
                 icon: 'success',
                 title: 'Patient Care Report Saved!',
-                text: `Patient Care Record saved successfully.`,
+                text: 'Patient Care Record saved successfully.',
                 confirmButtonText: 'OK',
-            })
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    ResetForms(); // Calls ResetForms() only after clicking OK
+                }
+            });
+
+
         } catch (error) {
             console.error("Error adding document: ", error);
 

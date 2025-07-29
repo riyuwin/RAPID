@@ -62,10 +62,10 @@ function Sidebar({ isVisible }) {
             .catch((error) => console.error("Logout error: ", error));
     };
 
-    const handleNavigation = ({ url_path }) => {
-        navigate(url_path);
-        window.location.reload();
+    const handleNavigation = (url_path) => {
+        window.location.href = url_path;
     };
+
 
     return (
         <>
@@ -73,15 +73,16 @@ function Sidebar({ isVisible }) {
                 <aside id="sidebar" className="sidebar">
                     <ul className="sidebar-nav" id="sidebar-nav">
                         <li className="nav-item">
-                            <Link
+                            <button
                                 className={`nav-link ${isActive('/arp/dashboard') ? '' : 'collapsed'}`}
                                 id="dashboard"
-                                to="/arp/dashboard"
-                            /* onClick={() => handleNavigation('/arp/dashboard')} */
+                                /* to="/arp/dashboard" */
+                                onClick={() => handleNavigation('/arp/dashboard')}
+
                             >
                                 <i className="bi bi-grid"></i>
                                 <span>Dashboard</span>
-                            </Link>
+                            </button>
                         </li>
 
                         <hr />
@@ -89,37 +90,37 @@ function Sidebar({ isVisible }) {
                         <li className="nav-heading">AMBULANCE PERSONNEL TOOL</li>
 
                         <li className="nav-item">
-                            <Link
+                            <button
                                 className={`nav-link ${isActive('/arp/patient_care_report') ? '' : 'collapsed'}`}
-                                to="/arp/patient_care_report"
-                            /* onClick={() => handleNavigation('/arp/location_tracking_record')} */
+                                /* to="/arp/patient_care_report" */
+                                onClick={() => handleNavigation('/arp/patient_care_report')}
                             >
                                 <i className="bx bxs-ambulance"></i>
                                 <span>Patient Care Report</span>
-                            </Link>
+                            </button>
                         </li>
 
                         <li className="nav-item">
-                            <Link
+                            <button
                                 className={`nav-link ${isActive('/arp/location_tracking_record') ? '' : 'collapsed'}`}
-                                to="/arp/location_tracking_record"
-                            /*  onClick={() => handleNavigation('/arp/location_tracking_record')} */
+                                /* to="/arp/location_tracking_record" */
+                                onClick={() => handleNavigation('/arp/location_tracking_record')}
                             >
                                 <i className="bx bxs-map"></i>
                                 <span>Location Tracking Record</span>
-                            </Link>
+                            </button>
                         </li>
 
                         <hr />
 
-                        <Link
+                        <button
                             className={`nav-link ${isActive('/arp/profile') ? '' : 'collapsed'}`}
                             to="/arp/profile"
-                        /* onClick={() => { handleNavigation("/arp/profile") }} */
+                            onClick={() => { handleNavigation("/arp/profile") }}
                         >
                             <i className="bi bi-person"></i>
                             <span>My Profile</span>
-                        </Link>
+                        </button>
 
                         {isUserLoggedIn ? (
                             <>

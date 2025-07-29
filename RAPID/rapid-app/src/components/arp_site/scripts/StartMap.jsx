@@ -1,116 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-/* import '../../../../css/style.css'; */
-import 'leaflet-routing-machine';
-import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+import React, { useState, useEffect, useRef } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import "leaflet-routing-machine";
+import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+
+// Import marker images manually
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 export const StartMap = ({ coordinates }) => {
-    const [map, setMap] = useState(null);
-    const [showMap, setShowMap] = useState(false); // Control when to show the map
-    const [startPoint, setStartPoint] = useState([14.0996, 122.9550]); // Default start location
+    const [showMap, setShowMap] = useState(false);
+    const mapRef = useRef(null);
+    const routingControlRef = useRef(null);
+    const mapContainerRef = useRef(null);
 
-    const getLocationName = async (latitude, longitude) => {
-        try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
-            const data = await response.json();
-            return data.display_name || "Unknown Location";
-        } catch (error) {
-            console.error("Error fetching location:", error);
-            return "Unknown Location";
-        }
-    };
+    const startPoint = [14.0996, 122.9550]; // Default start location
+
+    // Define a custom marker icon
+    const customMarker = L.icon({
+        iconUrl: markerIcon,
+        shadowUrl: markerShadow,
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41],
+    });
 
     useEffect(() => {
-        // Only initialize the map when the modal is opened
-        if (!showMap) return;
+        if (!showMap || !mapContainerRef.current) return;
 
-        const initializeMap = async () => {
-            // Remove previous map instance if exists
-            if (map) {
-                map.remove();
-            }
+        // **Fix: Remove the existing map instance if it exists**
+        if (mapRef.current) {
+            mapRef.current.remove();
+            mapRef.current = null;
+        }
 
-            // Initialize the map
-            const initMap = L.map('map', {
-                center: startPoint, // Center the map at the start location
-                zoom: 13,
-            });
+        // Initialize the map
+        const mapInstance = L.map(mapContainerRef.current, {
+            center: startPoint,
+            zoom: 13,
+        });
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            }).addTo(initMap);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution:
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(mapInstance);
 
-            // Add markers and connect routes between points if coordinates are provided
-            if (coordinates && coordinates.length > 1) {
-                const routeControl = L.Routing.control({
-                    waypoints: coordinates.map(coord => L.latLng(coord.latitude, coord.longitude)),
-                    routeWhileDragging: false, // Disable dragging
-                    showAlternatives: false, // Do not show alternative routes
-                    lineOptions: { styles: [{ color: 'red', weight: 4 }] }, // Red line for routes
-                    createMarker: () => null, // Do not show default markers
-                    router: L.Routing.osrmv1({
-                        serviceUrl: 'https://router.project-osrm.org/route/v1', // OSRM server for routing
-                    }),
-                    show: true, // Show the instruction panel
-                    formatter: new L.Routing.Formatter({ units: 'metric', round: true, itineraryFormatter: () => '' }),
-                }).addTo(initMap);
+        // Create a route if coordinates are provided
+        if (coordinates && coordinates.length > 1) {
+            const waypoints = coordinates.map((coord) =>
+                L.latLng(coord.latitude, coord.longitude)
+            );
 
-                // Add markers for each coordinate point
-                for (const coord of coordinates) {
-                    const formattedTimestamp = coord.timestamp
-                        ? new Date(coord.timestamp).toLocaleString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true
-                        }).replace(",", " at ")
-                        : "N/A";
+            const routeControl = L.Routing.control({
+                waypoints: waypoints,
+                routeWhileDragging: false,
+                showAlternatives: false,
+                lineOptions: { styles: [{ color: "red", weight: 5 }] }, // Red route line
+                createMarker: (i, waypoint) => {
+                    return L.marker(waypoint.latLng, { icon: customMarker });
+                },
+                router: L.Routing.osrmv1({
+                    serviceUrl: "https://router.project-osrm.org/route/v1",
+                }),
+            }).addTo(mapInstance);
 
-                    // Fetch the location name based on the coordinates
-                    const locationName = await getLocationName(coord.latitude, coord.longitude);
+            routingControlRef.current = routeControl;
+        }
 
-                    L.marker([coord.latitude, coord.longitude])
-                        .addTo(initMap)
-                        .bindPopup(`
-                            <b>Timestamp:</b> ${formattedTimestamp}<br/>
-                            <b>Latitude:</b> ${coord.latitude}<br/>
-                            <b>Longitude:</b> ${coord.longitude}<br/>
-                            <b>Location:</b> ${locationName}
-                        `);
-                }
-            }
+        mapRef.current = mapInstance;
 
-            // Update map state
-            setMap(initMap);
-        };
-
-        initializeMap();
-
-        // Clean up on unmount or when the coordinates change
         return () => {
-            if (map) map.remove();
+            if (mapRef.current) {
+                mapRef.current.remove();
+                mapRef.current = null;
+            }
+            if (routingControlRef.current) {
+                routingControlRef.current.remove();
+                routingControlRef.current = null;
+            }
         };
-    }, [showMap, coordinates]); // Re-run the effect when coordinates change
+    }, [showMap, coordinates]);
 
     return (
-        <>
-            <div className="col-md-12">
-                <div className="modal-body d-flex justify-content-center align-items-center">
-                    {!showMap && (
-                        <button
-                            className="btn btn-primary"
-                            onClick={() => setShowMap(true)}
-                        >
-                            Show Map
-                        </button>
-                    )}
-                </div>
-
-                {showMap && <div id="map" style={{ height: '500px', width: '100%' }}></div>}
+        <div className="col-md-12">
+            <div className="modal-body d-flex justify-content-center align-items-center">
+                {!showMap && (
+                    <button className="btn btn-primary" onClick={() => setShowMap(true)}>
+                        Show Map
+                    </button>
+                )}
             </div>
-        </>
+
+            {showMap && <div ref={mapContainerRef} style={{ height: "500px", width: "100%" }} />}
+        </div>
     );
 };

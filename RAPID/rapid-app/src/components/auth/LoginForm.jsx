@@ -99,11 +99,20 @@ function LoginForm() {
                         <div className="row">
                             <div className="col-md-6 " >
                                 <div className="caption_container">
+
                                     <img src='assets/img/authbg/ambulance.gif'
                                         className='ambulance_gif' />
 
                                     <h2 className="title">RAPID</h2>
-                                    <p className="subtitle">Real-Time Ambulance Patient Information Dissemination: An Application for Immediate Ambulance to Hospital Patient Data and Incident Report Transmission</p>
+                                    <p className="subtitle">Real-Time Ambulance Patient Information Dissemination: A Web-Application for Immediate Ambulance-to-Hospital Patient Data and Incident Report Transmission</p>
+
+                                    <br />
+
+                                    <div className="d-flex align-items-start gap-3">
+                                        <img src="assets/img/authbg/stem_logo.png" className="stem_logo" alt="STEM Logo" />
+                                        <img src="assets/img/logo1.png" className="stem_logo" alt="Logo 1" />
+                                    </div>
+
                                 </div>
                             </div>
 

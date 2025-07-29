@@ -219,9 +219,6 @@ function ARP_DashboardContent() {
     return (
         <>
             <div id="main" className="main">
-                <div className="container-arp">
-                    <h1>asgsag</h1>
-                </div>
 
                 <div className="content"  >
                     <div className="row">
@@ -237,7 +234,6 @@ function ARP_DashboardContent() {
                                 </ol>
                             </nav>
                         </div>
-                        {/* <TopNav /> */}
 
 
                     </div>

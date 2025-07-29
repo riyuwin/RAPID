@@ -8,7 +8,7 @@ function Dashboard() {
     const [authorization, setAuthorization] = useState(false);
 
     useEffect(() => {
-        setAuthorization(false); // Initially, assume not authorized
+        setAuthorization(false);
     }, []);
 
     return (

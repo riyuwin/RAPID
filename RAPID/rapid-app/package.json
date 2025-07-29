@@ -26,8 +26,10 @@
     "react-dom": "^18.3.1",
     "react-paginate": "^8.3.0",
     "react-router-dom": "^7.0.2",
+    "react-toastify": "^11.0.3",
     "select-philippines-address": "^1.0.6",
-    "sweetalert2": "^11.15.2"
+    "sweetalert2": "^11.15.2",
+    "sweetalert2-react-content": "^5.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",

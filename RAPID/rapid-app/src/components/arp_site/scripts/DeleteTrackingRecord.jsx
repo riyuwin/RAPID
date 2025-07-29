@@ -30,10 +30,13 @@ async function DeleteTrackingRecord(collectionName, documentId, onSuccess) {
                 timer: 1500,
             });
 
+            // Set tracking status in localStorage after success
+            localStorage.setItem("trackingStatus", "Stop Tracking");
+
             // Trigger the onSuccess callback if provided
-            /* if (onSuccess) {
+            if (onSuccess) {
                 onSuccess();
-            } */
+            }
         }
     } catch (error) {
         // Show an error message

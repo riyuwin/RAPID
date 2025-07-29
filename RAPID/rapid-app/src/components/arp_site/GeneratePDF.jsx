@@ -32,10 +32,10 @@ function GeneratePdf() {
     const callDets = {};
     if (getValueInputIfNotEmpty('callReceived')) callDets['callReceived'] = getValueInputIfNotEmpty('callReceived');
     if (getValueInputIfNotEmpty('toScene')) callDets['toScene'] = getValueInputIfNotEmpty('toScene');
-    if (getValueInputIfNotEmpty('atSceneInput')) callDets['atScene'] = getValueInputIfNotEmpty('atSceneInput');
-    if (getValueInputIfNotEmpty('toHospitalInput')) callDets['toHospital'] = getValueInputIfNotEmpty('toHospitalInput');
-    if (getValueInputIfNotEmpty('atHospitalInput')) callDets['atHospital'] = getValueInputIfNotEmpty('atHospitalInput');
-    if (getValueInputIfNotEmpty('baseInput')) callDets['base'] = getValueInputIfNotEmpty('baseInput');
+    if (getValueInputIfNotEmpty('atSceneInput')) callDets['atSceneInput'] = getValueInputIfNotEmpty('atSceneInput');
+    if (getValueInputIfNotEmpty('toHospitalInput')) callDets['toHospitalInput'] = getValueInputIfNotEmpty('toHospitalInput');
+    if (getValueInputIfNotEmpty('atHospitalInput')) callDets['atHospitalInput'] = getValueInputIfNotEmpty('atHospitalInput');
+    if (getValueInputIfNotEmpty('baseInput')) callDets['baseInput'] = getValueInputIfNotEmpty('baseInput');
 
     const basicInformation = {};
 
@@ -100,7 +100,7 @@ function GeneratePdf() {
     if (getCheckboxValueIfChecked('obsGynHaemorrhageLess')) obs_gnyae['obsGynHaemorrhageLess'] = true;
     if (getCheckboxValueIfChecked('obsGynLabour')) obs_gnyae['obsGynLabour'] = true;
     if (getCheckboxValueIfChecked('obsGynPPH')) obs_gnyae['obsGynPPH'] = true;
-    if (getCheckboxValueIfChecked('obsGynPreDelivery')) obs_gnyae['obsGynPreDelivery'] = true;
+    /* if (getCheckboxValueIfChecked('obsGynPreDelivery')) obs_gnyae['obsGynPreDelivery'] = true; */
 
     // Handle "Other Obstetrics/Gynaecology" logic
     const otherObsGynChecked = getCheckboxValueIfChecked('otherObsGyn');
@@ -144,7 +144,7 @@ function GeneratePdf() {
 
 
     const mechanismInjury = {};
-    if (getCheckboxValueIfChecked('mechanismInjuryAssault')) mechanismInjury['mechanismInjuryAssault'] = true;
+    /* if (getCheckboxValueIfChecked('mechanismInjuryAssault')) mechanismInjury['mechanismInjuryAssault'] = true;
     if (getCheckboxValueIfChecked('mechanismInjuryAnimalAttack')) mechanismInjury['mechanismInjuryAnimalAttack'] = true;
     if (getCheckboxValueIfChecked('mechanismInjuryChemical')) mechanismInjury['mechanismInjuryChemical'] = true;
     if (getCheckboxValueIfChecked('mechanismInjuryDrowning')) mechanismInjury['mechanismInjuryDrowning'] = true;
@@ -166,7 +166,7 @@ function GeneratePdf() {
     const mechanismInjuryOtherInputValue = getValueInputIfNotEmpty('mechanismInjuryOtherInput');
     if (mechanismInjuryOtherChecked && mechanismInjuryOtherInputValue) {
         mechanismInjury['mechanismInjuryOtherInput'] = mechanismInjuryOtherInputValue;
-    }
+    } */
 
     const medical = {};
     if (getCheckboxValueIfChecked('medicalBackPain')) medical['medicalBackPain'] = true;
@@ -547,10 +547,10 @@ function GeneratePdf() {
     if (getValueInputIfNotEmpty('vehicularAccidentDetails')) part2['vehicularAccidentDetails'] = getValueInputIfNotEmpty('vehicularAccidentDetails');
 
     const classification = {};
-    if (getValueInputIfNotEmpty('classificationPrivate')) classification['classificationPrivate'] = getValueInputIfNotEmpty('classificationPrivate');
-    if (getValueInputIfNotEmpty('classificationPublic')) classification['classificationPublic'] = getValueInputIfNotEmpty('classificationPublic');
-    if (getValueInputIfNotEmpty('classificationGovernment')) classification['classificationGovernment'] = getValueInputIfNotEmpty('classificationGovernment');
-    if (getValueInputIfNotEmpty('classificationDiplomat')) classification['classificationDiplomat'] = getValueInputIfNotEmpty('classificationDiplomat');
+    if (getCheckboxValueIfChecked('classificationPrivate')) classification['classificationPrivate'] = getCheckboxValueIfChecked('classificationPrivate');
+    if (getCheckboxValueIfChecked('classificationPublic')) classification['classificationPublic'] = getCheckboxValueIfChecked('classificationPublic');
+    if (getCheckboxValueIfChecked('classificationGovernment')) classification['classificationGovernment'] = getCheckboxValueIfChecked('classificationGovernment');
+    if (getCheckboxValueIfChecked('classificationDiplomat')) classification['classificationDiplomat'] = getCheckboxValueIfChecked('classificationDiplomat');
 
     const typeVehicle = {};
     if (getCheckboxValueIfChecked('motorcycle')) typeVehicle['motorcycle'] = getCheckboxValueIfChecked('motorcycle');
@@ -709,6 +709,26 @@ function GeneratePdf() {
             };
 
             // Draw text fields on the first page (considering margins)
+
+            if (callDets.callReceived) {
+                drawTextDynamic(callDets.callReceived, margin + 240, originalHeight1 - 360, 300, 30);
+            }
+            if (callDets.toScene) {
+                drawTextDynamic(callDets.toScene, margin + 470, originalHeight1 - 360, 300, 30);
+            }
+            if (callDets.atSceneInput) {
+                drawTextDynamic(callDets.atSceneInput, margin + 700, originalHeight1 - 360, 300, 30);
+            }
+            if (callDets.toHospitalInput) {
+                drawTextDynamic(callDets.toHospitalInput, margin + 965, originalHeight1 - 360, 300, 30);
+            }
+            if (callDets.atHospitalInput) {
+                drawTextDynamic(callDets.atHospitalInput, margin + 1230, originalHeight1 - 360, 300, 30);
+            }
+            if (callDets.baseInput) {
+                drawTextDynamic(callDets.baseInput, margin + 1405, originalHeight1 - 360, 300, 30);
+            }
+
             if (basicInformation.surname) {
                 drawTextDynamic(basicInformation.surname, margin + 20, originalHeight1 - 445, 300, 30);
             }
@@ -803,9 +823,10 @@ function GeneratePdf() {
             if (obs_gnyae.obsGynPPH == true) {
                 drawTextDynamic('/', margin + 337, originalHeight1 - 790, 300, 24);
             }
-            if (obs_gnyae.obsGynPreDelivery == true) {
+            /* if (obs_gnyae.obsGynPreDelivery == true) {
                 drawTextDynamic('/', margin + 337, originalHeight1 - 820, 300, 24);
-            }
+            } */
+
             if (obs_gnyae.otherObsGynInput) {
                 drawTextDynamic('/', margin + 337, originalHeight1 - 850, 300, 24);
                 drawTextDynamic(obs_gnyae.otherObsGynInput, margin + 337, originalHeight1 - 880, 300, 24);
@@ -863,7 +884,7 @@ function GeneratePdf() {
                 drawTextDynamic(trauma.otherTraumaInput, margin + 916, originalHeight1 - 1075, 300, 24);
             }
 
-            if (mechanismInjury.mechanismInjuryAssault == true) {
+            /* if (mechanismInjury.mechanismInjuryAssault == true) {
                 drawTextDynamic('/', margin + 1210, originalHeight1 - 672, 300, 24);
             }
             if (mechanismInjury.mechanismInjuryAnimalAttack == true) {
@@ -917,7 +938,7 @@ function GeneratePdf() {
             if (mechanismInjury.mechanismInjuryOtherInput) {
                 drawTextDynamic('/', margin + 1210, originalHeight1 - 1185, 300, 24);
                 drawTextDynamic(mechanismInjury.mechanismInjuryOtherInput, margin + 1250, originalHeight1 - 1210, 300, 24);
-            }
+            } */
 
             if (medical.medicalBackPain == true) {
                 drawTextDynamic('/', margin + 60, originalHeight1 - 935, 300, 24);
@@ -2606,6 +2627,7 @@ function GeneratePdf() {
                 drawTextDynamicPage2('/', margin + 1155, originalHeight1 - 1556, 300, 28);
             }
 
+
             // Save the PDF and create a URL
             const pdfBytes = await pdfDoc.save();
             const blob = new Blob([pdfBytes], { type: "application/pdf" });
@@ -2619,12 +2641,12 @@ function GeneratePdf() {
 
     return (
         <div>
-            <button onClick={generatePdf} style={{ marginBottom: "10px", marginRight: '5px' }}>
+            <button type="button" onClick={generatePdf} style={{ marginBottom: "10px", marginRight: '5px' }}>
                 Generate PDF
             </button>
 
             {pdfUrl && (
-                <a href={pdfUrl} download="generated.pdf">
+                <a type="button" href={pdfUrl} download="generated.pdf">
                     Download PDF
                 </a>
             )}

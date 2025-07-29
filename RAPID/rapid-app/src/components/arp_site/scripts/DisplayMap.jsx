@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-/* import '../../../../css/style.css'; */
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
-export const DisplayMap = ({ coordinates }) => {
+// Fix for missing markers in production
+import markerIconPng from 'leaflet/dist/images/marker-icon.png';
+import markerShadowPng from 'leaflet/dist/images/marker-shadow.png';
 
+export const DisplayMap = ({ coordinates }) => {
     const [showMap, setShowMap] = useState(true);
     const [startPoint, setStartPoint] = useState([14.0996, 122.9550]); // Default fallback location
     const [currentLocation, setCurrentLocation] = useState(null);
+
     const mapRef = useRef(null);
     const routingControlRef = useRef(null);
     const markersRef = useRef([]);
@@ -64,7 +67,7 @@ export const DisplayMap = ({ coordinates }) => {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             }).addTo(initMap);
 
-            // Fetch current location
+            // Fetch user's current location
             let userLocation = startPoint;
             try {
                 userLocation = await fetchCurrentLocation();
@@ -75,7 +78,14 @@ export const DisplayMap = ({ coordinates }) => {
 
             getLocationName(userLocation[0], userLocation[1])
                 .then((resolvedValue) => {
-                    const userLocationMarker = L.marker(userLocation)
+                    const userLocationMarker = L.marker(userLocation, {
+                        icon: L.icon({
+                            iconUrl: markerIconPng,
+                            shadowUrl: markerShadowPng,
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                        })
+                    })
                         .addTo(initMap)
                         .bindPopup(`Your Current Location: ${resolvedValue}`);
                     userLocationMarker.openPopup();
@@ -108,14 +118,21 @@ export const DisplayMap = ({ coordinates }) => {
                     }).replace(",", " at ")
                     : "N/A";
 
-                const marker = L.marker([coord.latitude, coord.longitude])
+                const marker = L.marker([coord.latitude, coord.longitude], {
+                    icon: L.icon({
+                        iconUrl: markerIconPng,
+                        shadowUrl: markerShadowPng,
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41]
+                    })
+                })
                     .addTo(initMap)
                     .bindPopup(`
-                        <b>Timestamp:</b> ${formattedTimestamp}<br/>
-                        <b>Latitude:</b> ${coord.latitude}<br/>
-                        <b>Longitude:</b> ${coord.longitude}<br/>
-                        <b>Location:</b> ${locationName}
-                    `);
+                    <b>Timestamp:</b> ${formattedTimestamp}<br/>
+                    <b>Latitude:</b> ${coord.latitude}<br/>
+                    <b>Longitude:</b> ${coord.longitude}<br/>
+                    <b>Location:</b> ${locationName}
+                `);
 
                 markersRef.current.push(marker);
             }
@@ -133,39 +150,50 @@ export const DisplayMap = ({ coordinates }) => {
     }, [showMap]);
 
     useEffect(() => {
-        if (mapRef.current && routingControlRef.current) {
-            // Update the route and markers when coordinates change
-            routingControlRef.current.setWaypoints([L.latLng(currentLocation || startPoint), ...coordinates.map(coord => L.latLng(coord.latitude, coord.longitude))]);
+        if (!mapRef.current || !routingControlRef.current) return;
 
-            // Remove old markers and add new ones
-            markersRef.current.forEach(marker => marker.remove());
-            markersRef.current = [];
+        // Update route when coordinates change
+        routingControlRef.current.setWaypoints([
+            L.latLng(currentLocation || startPoint),
+            ...coordinates.map(coord => L.latLng(coord.latitude, coord.longitude))
+        ]);
 
-            coordinates.forEach(async (coord) => {
-                const locationName = await getLocationName(coord.latitude, coord.longitude);
-                const formattedTimestamp = coord.timestamp
-                    ? new Date(coord.timestamp).toLocaleString("en-US", {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,
-                    }).replace(",", " at ")
-                    : "N/A";
+        // Remove old markers and add new ones
+        markersRef.current.forEach(marker => marker.remove());
+        markersRef.current = [];
 
-                const marker = L.marker([coord.latitude, coord.longitude])
-                    .addTo(mapRef.current)
-                    .bindPopup(`
-                        <b>Timestamp:</b> ${formattedTimestamp}<br/>
-                        <b>Latitude:</b> ${coord.latitude}<br/>
-                        <b>Longitude:</b> ${coord.longitude}<br/>
-                        <b>Location:</b> ${locationName}
-                    `);
+        coordinates.forEach(async (coord) => {
+            const locationName = await getLocationName(coord.latitude, coord.longitude);
+            const formattedTimestamp = coord.timestamp
+                ? new Date(coord.timestamp).toLocaleString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                }).replace(",", " at ")
+                : "N/A";
 
-                markersRef.current.push(marker);
-            });
-        }
+            const marker = L.marker([coord.latitude, coord.longitude], {
+                icon: L.icon({
+                    iconUrl: markerIconPng,
+                    shadowUrl: markerShadowPng,
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41]
+                })
+            })
+                .addTo(mapRef.current)
+                .bindPopup(`
+                <b>Timestamp:</b> ${formattedTimestamp}<br/>
+                <b>Latitude:</b> ${coord.latitude}<br/>
+                <b>Longitude:</b> ${coord.longitude}<br/>
+                <b>Location:</b> ${locationName}
+            `);
+
+            markersRef.current.push(marker);
+        });
+
     }, [coordinates, currentLocation]);
 
     return (

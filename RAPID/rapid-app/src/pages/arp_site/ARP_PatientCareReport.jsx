@@ -10,7 +10,7 @@ function ARP_PatientCareReport() {
     const [authorization, setAuthorization] = useState(false);
 
     useEffect(() => {
-        setAuthorization(false); // Initially, assume not authorized
+        setAuthorization(false);
     }, []);
 
     return (

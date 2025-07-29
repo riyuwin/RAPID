@@ -4,7 +4,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 function CharacterModel({ data }) {
-    console.log("Haaaa", data)
 
     const [characterModelData, setCharacterModelData] = useState({
         rightHead: null,
@@ -68,7 +67,7 @@ function CharacterModel({ data }) {
 
     useEffect(() => {
         if (Array.isArray(data) && data.length > 0 && data[0]?.characterModel) {
-            console.log("Updating state with:", data[0].characterModel);
+            /* console.log("Updating state with:", data[0].characterModel); */
             setCharacterModelData(prevState => ({
                 ...prevState,
                 ...data[0].characterModel
